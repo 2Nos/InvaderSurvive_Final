@@ -1,17 +1,18 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(PlayerBodyManager))]
 [RequireComponent(typeof(PlayerInputManager))] // PlayerInputManager컴포넌트를 종속성으로 자동으로 추가
 public class PlayerLocomotion : MonoBehaviour
 {
-
     [SerializeField] private float m_moveSpeed = 5f;
     [SerializeField] private float m_sprintSpeed = 8f;
     [SerializeField] private float m_crouchSpeed = 2.5f;
-
+    
     private PlayerInputManager m_inputManager;
     private PlayerBodyManager m_bodyManager;
     private PlayerAnimationManager m_animationManager;
+    private CameraManager m_cameraManager;
     private PlayerBodyState m_currentState;
 
     private Vector3 m_moveDirection;
@@ -29,6 +30,7 @@ public class PlayerLocomotion : MonoBehaviour
         m_inputManager = GetComponent<PlayerInputManager>();
         m_bodyManager = GetComponent<PlayerBodyManager>(); // GetComponent 사용
         m_animationManager = GetComponentInChildren<PlayerAnimationManager>();
+        m_cameraManager = Camera.main.gameObject.GetComponent<CameraManager>();
         // 초기 상태 설정
         ChangeState(new PlayerBodyIdleState(this));
     }
@@ -62,21 +64,22 @@ public class PlayerLocomotion : MonoBehaviour
 
         // 이동 방향 계산
         Vector2 moveInput = m_inputManager.MovementInput;
-        m_moveDirection = new Vector3(moveInput.x, 0f, moveInput.y).normalized * m_currentMoveSpeed;
-
+        m_moveDirection = (transform.right*moveInput.x + transform.forward*moveInput.y) * m_currentMoveSpeed;
+        m_moveDirection.Normalize();
         // 이동 적용
         transform.position += m_moveDirection * Time.deltaTime;
 
         // 하체 회전 업데이트
-        m_bodyManager.UpdateLowerBodyRotation(moveInput);
+        //m_bodyManager.UpdateLowerBodyRotation(moveInput);
     }
 
     public void HandleRotation()
     {
-        if (m_inputManager.IsAiming)
+        //if (m_inputManager.IsAiming)
         {
-            m_bodyManager.UpdateUpperBodyRotation(m_inputManager.LookInput);
+            m_bodyManager.BodyRotation(m_cameraManager.m_currentRotationY);
         }
+        
     }
 
 }
