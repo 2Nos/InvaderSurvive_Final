@@ -24,5 +24,7 @@ public class PlayerBodyIdleState : PlayerBodyState
         {
             m_locomotion.ChangeState(new PlayerBodyAimState(m_locomotion));
         }
+
+        m_locomotion.HandleRotation();
     }
 }

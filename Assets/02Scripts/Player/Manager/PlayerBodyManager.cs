@@ -1,12 +1,17 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
+using static UnityEngine.GraphicsBuffer;
 
 public class PlayerBodyManager : MonoBehaviour
 {
     [Header("Body Settings")]
     [SerializeField] private Transform m_upperBodyTransform;
     [SerializeField] private Transform m_weaponHolder;
-    [SerializeField] private float m_upperBodyRotationSpeed = 10f;
-    [SerializeField] private float m_lowerBodyRotationSpeed = 10f;
+    //[SerializeField] private float m_upperBodyRotationSpeed = 10f;
+    //[SerializeField] private float m_lowerBodyRotationSpeed = 10f;
+
+    private float m_turnSmoothTime = 0.1f;
+    public float m_turnSmoothVelocity;
 
     [Header("Aiming Settings")]
     [SerializeField] private Vector3 m_normalWeaponPosition = new Vector3(0.5f, 1.2f, 0.5f);
@@ -16,7 +21,6 @@ public class PlayerBodyManager : MonoBehaviour
     private Animator m_animator;
     private bool m_isAiming;
     private Vector3 m_targetWeaponPosition;
-
     private void Awake()
     {
         m_animator = GetComponent<Animator>();
@@ -35,8 +39,15 @@ public class PlayerBodyManager : MonoBehaviour
             );
         }
     }
+    public void BodyRotation(float royY)
+    {
+        Vector3 playerEuler = transform.eulerAngles;
+        playerEuler.y = royY;
+        transform.rotation = Quaternion.Euler(playerEuler);
+    }
 
 
+    /*//조준 상태
     public void UpdateUpperBodyRotation(Vector2 lookInput)
     {
         if (m_animator == null) return;
@@ -58,7 +69,7 @@ public class PlayerBodyManager : MonoBehaviour
         // 하체 회전 처리
         float yaw = Mathf.Atan2(moveInput.x, moveInput.y) * Mathf.Rad2Deg;
         m_animator.SetFloat("LowerBodyYaw", yaw);
-    }
+    }*/
 
     public void SetAiming(bool isAiming)
     {
