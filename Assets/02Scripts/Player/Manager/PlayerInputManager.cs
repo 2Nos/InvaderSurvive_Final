@@ -4,11 +4,17 @@ using UnityEngine.InputSystem;
 public class PlayerInputManager : MonoBehaviour
 {
     public Vector2 MovementInput { get; private set; }
-    public Vector2 LookInput { get; private set; } //마우스 회전
     public bool IsMoving => MovementInput.sqrMagnitude > 0.01f;
+    public Vector2 LookInput { get; private set; } //마우스 회전
+    public bool IsAttacking { get; private set; } //마우스 좌클릭
     public bool IsAiming { get; private set; } //마우스 우클릭
     public bool IsSprinting { get; private set; } //왼쪽 쉬프트
     public bool IsCrouching { get; private set; } //왼쪽 컨트롤
+    public bool IsJumping { get; private set; } //스페이스바
+    public bool IsDodging { get; private set; } //F
+    public bool IsUsingSkill { get; private set; } //QE
+    public bool IsReloading { get; private set; } //R
+    
 
     // InputSystem_Actions 클래스의 인스턴스
     private PlayerInputAC m_inputActions;
@@ -32,7 +38,14 @@ public class PlayerInputManager : MonoBehaviour
         m_inputActions.Player.Sprint.canceled += OnSprint;
         m_inputActions.Player.Crouch.performed += OnCrouch;
         m_inputActions.Player.Crouch.canceled += OnCrouch;
-        
+        m_inputActions.Player.Jump.performed += OnJump;
+        m_inputActions.Player.Jump.canceled += OnJump;
+        m_inputActions.Player.Dodge.performed += OnDodge;
+        m_inputActions.Player.Dodge.canceled += OnDodge;
+        m_inputActions.Player.Skill.performed += OnSkill;
+        m_inputActions.Player.Skill.canceled += OnSkill;
+
+
         // 액션 활성화
         m_inputActions.Enable();
     }
@@ -78,5 +91,21 @@ public class PlayerInputManager : MonoBehaviour
     {
         IsCrouching = context.ReadValueAsButton();
     }
+
+    private void OnJump(InputAction.CallbackContext context)
+    {
+        IsJumping = context.ReadValueAsButton();
+    }
+
+    private void OnDodge(InputAction.CallbackContext context)
+    {
+        IsDodging = context.ReadValueAsButton();
+    }
+
+    private void OnSkill(InputAction.CallbackContext context)
+    {
+        IsUsingSkill = context.ReadValueAsButton();
+    }
+
 
 }

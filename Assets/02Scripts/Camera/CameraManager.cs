@@ -11,7 +11,7 @@ public class CameraManager : MonoBehaviour
 
     [Header("카메라 위치 설정")]
     [SerializeField] Vector3 m_offset = new Vector3(0.4f, 0.4f, -1.5f);  // 카메라 위치 오프셋
-    [SerializeField]  float m_smoothSpeed = 10f;  
+    [SerializeField] float m_smoothSpeed = 10f;
 
     [Header("카메라 회전 설정")]
     public float m_rotationSmoothSpeed;             // 카메라 회전 부드러움 정도
