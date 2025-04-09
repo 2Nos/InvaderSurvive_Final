@@ -29,8 +29,7 @@ public class PlayerLocomotion : MonoBehaviour
     private PlayerAnimationManager m_animationManager;
     private PlayerInventoryManager m_inventoryManager;
     private PlayerAbilityManager m_abilityManager;
-    private PlayerMainState m_currentState;
-    private List<PlayerSubState> m_activeSubStates = new List<PlayerSubState>();
+    private PlayerState m_currentState;
     #endregion
 
     #region [Weapon]
@@ -39,7 +38,12 @@ public class PlayerLocomotion : MonoBehaviour
 
     private Vector3 m_moveDirection;
     private float m_currentMoveSpeed;
-    private bool m_isGround;
+    private bool m_isAir;            // 공중 상태(점프 / 낙하)
+    private bool m_isGround;         // 착지 상태
+    private bool m_isSliding;        //달리는 중 앉기
+    private bool m_isClimbing;       //벽에서 F키 눌렀을 때?
+    private bool m_isWallRunning;    //벽에서 달리기 상호 작용
+
 
     // Getter 메서드들 추가
     public PlayerInputManager GetInputManager() => m_inputManager;
@@ -48,19 +52,23 @@ public class PlayerLocomotion : MonoBehaviour
     public PlayerAbilityManager GetAbilityManager() => m_abilityManager;
     public WeaponManager GetWeaponManager() => m_weaponManager;
     public FlagManager GetFlagManager() => m_flagManager;
-
+    
+    // 상태 관련
+    public bool IsAir() => m_isAir;
     public bool IsGround() => m_isGround;
+    public bool IsSliding() => m_isSliding;
+    public bool IsClimbing() => m_isClimbing;
+    public bool IsWallRunning() => m_isWallRunning;
 
     private void Awake()
     {
         m_inputManager = GetComponent<PlayerInputManager>();
-        //m_bodyManager = GetComponent<PlayerBodyManager>(); // GetComponent 사용
         m_animationManager = GetComponentInChildren<PlayerAnimationManager>();
         m_inventoryManager = GetComponent<PlayerInventoryManager>();
         m_abilityManager = GetComponent<PlayerAbilityManager>();
-        //m_weaponManager = GetComponent<WeaponManager>();
+        m_weaponManager = FindObjectOfType<WeaponManager>();
         m_cameraManager = Camera.main.gameObject.GetComponent<CameraManager>();
-
+        m_flagManager = FindObjectOfType<FlagManager>();
         // 초기 상태 설정
         ChangeState(new IdleState(this));
     }
@@ -72,7 +80,7 @@ public class PlayerLocomotion : MonoBehaviour
     }
 
     // 상태 변경
-    public void ChangeState(PlayerMainState nextState)
+    public void ChangeState(PlayerState nextState)
     {
         m_currentState?.Exit();
         m_currentState = nextState;
@@ -87,6 +95,7 @@ public class PlayerLocomotion : MonoBehaviour
         {
             m_moveDirection = Vector3.zero;
             m_currentMoveSpeed = 0f;
+            m_animationManager.UpdateMovementAnimation(Vector3.zero);
             return;
         }
 
@@ -101,11 +110,15 @@ public class PlayerLocomotion : MonoBehaviour
         m_moveDirection.Normalize();
         // 이동 적용
         transform.position += m_moveDirection * Time.deltaTime;
+
+        //이동 애니메이션
+        m_animationManager.UpdateMovementAnimation(m_inputManager.MovementInput);
     }
 
     // 회전 처리
     public void HandleRotation()
     {
+        // 나중에 적용
         /*Vector3 lookDirection = new Vector3(m_inputManager.LookInput.x, 0, m_inputManager.LookInput.y);
 
         if(lookDirection.sqrMagnitude > 0.01f)
@@ -115,17 +128,12 @@ public class PlayerLocomotion : MonoBehaviour
             Quaternion targetRotation = Quaternion.LookRotation(worldDirection);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
         }*/
-
         Vector3 playerEuler = transform.eulerAngles;
-        playerEuler.y = m_inputManager.MovementInput.y;
+        playerEuler.y = m_cameraManager.m_yaw;
         transform.rotation = Quaternion.Euler(playerEuler);
     }
     #endregion
 
-    public bool HasSubState<T>() where T : PlayerSubState
-    {
-        return m_activeSubStates.Any(s => s is T);
-    }
 
     public void OnTriggerEnter(Collider other)
     {
