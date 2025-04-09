@@ -1,56 +1,77 @@
 using UnityEngine;
 using System;
 
-
-//상태 플래그를 비트 연산으로 처리하며 Flags는 다수의 열거형 선택이 가능
 /// <summary>
-/// 메인 상태이며 해당 동작중에도 다른 동작이 가능
+/// 메인 이동 상태
+/// 항상 단일(MainState들중 하나의, Flags 적용x) 상태로 유지 + Flags 복수개 선택
+/// Moving + LocomotionFlags(Sprinting + Aming)
 /// </summary>
-[Flags]
-public enum LocomotionStateFlags
+public enum LocomotionMainState
 {
-    None = 0,
-    Moving = 1 << 0,          // 기본 이동
-    Sprinting = 1 << 1,       // 달리기
-    Crouching = 1 << 2,       // 앉기
-    InAir = 1 << 4,          // 공중 (점프/낙하)
-    Sliding = 1 << 5,        // 슬라이딩
-    WallRunning = 1 << 6,    // 벽 달리기
-    Climbing = 1 << 7        // 등반
+    Idle = 0,           // Idle
+    Moving = 1,         // 기본 이동
+    InAir = 2,          // 공중 (점프/낙하)
+    Sliding = 3,        // 슬라이딩
+    Climbing = 4,       // 등반
+    WallRunning = 5     // 벽 달리기
 }
 
 /// <summary>
-/// 특수 이동, 해당 동작 중 다른 동작 X
+/// Flags는 복수의 열거형 선택이 가능한 기능. 즉, 복수 상태가 가능
+/// Flags는 2의 제곱수나 2의 제곱수 조합을 사용하여 선언해야함
+/// None =0, Sprinting = 1, Croucning = 2, 4,8 이런식 보다는 쉬프트연)
 /// </summary>
 [Flags]
-public enum SpecialLocomotionState
+public enum LocomotionSubFlags
 {
     None = 0,
-    Dodging = 1 << 1,        // 구르기
-    Vaulting = 1 << 2,
-    Grappling = 1 << 3
+    Sprinting = 1 << 1,         // 달리기
+    Crouching = 1 << 2,         // 앉기
 }
 
-// 전투 상태
-[Flags]
-public enum CombatStateFlags
+/// <summary>
+/// 전투상태일 때의 메인 상태
+/// </summary>
+public enum CombatMainState
 {
     None = 0,
-    Aiming = 1 << 0,           // 조준
-    Shooting = 1 << 1,         // 발사 (원거리)
-    Reloading = 1 << 2,        // 재장전
-    WeaponSwapping = 1 << 3,   // 무기 교체
-    UsingAbility = 1 << 4,     // 특수 능력 사용
-    UsingUltimate = 1 << 5,    // 궁극기 사용
-
-    MeleeAttacking = 1 << 6,   // 근접 공격 (일반)
-    ChargingMelee = 1 << 7,    // 근접 차지 공격 준비
-    ExecutingMelee = 1 << 8    // 근접 처형 (피니시)
+    Shooting = 1,         //원거리 공격
+    MeleeAttacking = 2,   //근접 공격
+    UsingAbility = 3,     //스킬(능력) 사용
+    UsingUltimate = 4     //궁극기 사용
 }
 
-// 상호작용 상태
+/// <summary>
+/// 메인 전투상태 + Flags 복수개
+/// </summary>
 [Flags]
-public enum InteractionStateFlags
+public enum CombatSubFlags
+{
+    None = 0,
+    Aming = 1 << 0,            // 조준
+    Reloading = 1 << 1,        // 재장전
+    WeaponSwapping = 1 << 2,   // 무기 교체
+    ChargingMelee = 1 << 3,    // 근접 차지 공격 준비
+    ExecutingMelee = 1 << 4    // 근접 처형 (피니시)
+}
+
+/// <summary>
+/// 순간적인 모든 상태에 영향이 가는 상태는 이렇게 따로 관리
+/// </summary>
+[Flags]
+public enum ActionStateFlags
+{
+    None = 0,
+    Dodging = 1 << 0,           // 구르기(회피기)
+    Staggered = 1 << 1,         // 피격 경직 같은 상태
+    Knockback = 1 << 2          // 넉백
+}
+
+/// <summary>
+/// 상호작용 상태
+/// </summary>
+[Flags]
+public enum InteractionFlags
 {
     None = 0,
     LootingItem = 1 << 0,    // 아이템 획득
@@ -63,32 +84,44 @@ public enum InteractionStateFlags
 
 public class FlagManager : MonoBehaviour
 {
-    public LocomotionStateFlags LocomotionState { get; private set; }
-    public CombatStateFlags CombatState { get; private set; }
-    public InteractionStateFlags InteractionState { get; private set; }
+    #region ----------------------------- Locomotion
+    //// Flags만 Setter Methods
+    public LocomotionMainState LocomotionMain { get; set; } = LocomotionMainState.Idle;
+    public LocomotionSubFlags LocomotionFlags { get; private set; } = LocomotionSubFlags.None;
+    public void SetLocomotionFlag(LocomotionSubFlags flag) => LocomotionFlags |= flag;      // 해당 상태로 설정
+    public bool HasLocomotionFlag(LocomotionSubFlags flag) => (LocomotionFlags & flag) != 0;
+    public void ClearLocomotionFlag(LocomotionSubFlags flag) => LocomotionFlags &= ~flag;   // 상태 설정 제거
+    #endregion --------------------------
 
-    // ---------------- Locomotion ----------------
-    //이런 식이면 if (m_flagManager.HasLocomotionFlag(LocomotionStateFlags.Crouching)) 등으로 깔끔하게 확인 가능
-    public void SetLocomotionFlag(LocomotionStateFlags flag) => LocomotionState |= flag;   //변경
-    public void UnsetLocomotionFlag(LocomotionStateFlags flag) => LocomotionState &= ~flag;  //제거
-    public bool HasLocomotionFlag(LocomotionStateFlags flag) => (LocomotionState & flag) != 0;  //확인
+    #region -------------------------- Combat
+    public CombatMainState CombatMain { get; set; } = CombatMainState.None;
+    public CombatSubFlags CombatFlags { get; private set; } = CombatSubFlags.None;
+    public void SetCombatFlag(CombatSubFlags flag) => CombatFlags |= flag;
+    public bool HasCombatFlag(CombatSubFlags flag) => (CombatFlags & flag) != 0;
+    public void ClearCombatFlag(CombatSubFlags flag) => CombatFlags &= ~flag;
+    #endregion --------------------------
 
-    // ---------------- Combat ----------------
-    public void SetCombatFlag(CombatStateFlags flag) => CombatState |= flag;
-    public void UnsetCombatFlag(CombatStateFlags flag) => CombatState &= ~flag;
-    public bool HasCombatFlag(CombatStateFlags flag) => (CombatState & flag) != 0;
+    #region -------------------------- Action
+    public ActionStateFlags ActionFlags { get; private set; } = ActionStateFlags.None;
+    public void SetActionStateFlags(ActionStateFlags flag) => ActionFlags |= flag;
+    public bool HasActionStateFlags(ActionStateFlags flag) => (ActionFlags & flag) != 0;
+    public void ClearActionStateFlags(ActionStateFlags flag) => ActionFlags &= ~flag;
+    #endregion --------------------------
 
-
-    // ---------------- Interaction ----------------
-    public void SetInteractionFlag(InteractionStateFlags flag) => InteractionState |= flag;
-    public void UnsetInteractionFlag(InteractionStateFlags flag) => InteractionState &= ~flag;
-    public bool HasInteractionFlag(InteractionStateFlags flag) => (InteractionState & flag) != 0;
-
-
+    #region -------------------------- Interaction
+    public InteractionFlags InteractionFlags { get; private set; } = InteractionFlags.None;
+    public void SetInteractionFlag(InteractionFlags flag) => InteractionFlags |= flag;
+    public bool HasInteractionFlag(InteractionFlags flag) => (InteractionFlags & flag) != 0;
+    public void ClearInteractionFlag(InteractionFlags flag) => InteractionFlags &= ~flag;
+    #endregion --------------------------
+    
     // 전체 상태 출력
     public string DumpAllStates()
     {
-        return $"[Locomotion: {LocomotionState}]\n[Combat: {CombatState}]\n[Interaction: {InteractionState}]";
+        return $"Locomotion Main: {LocomotionMain}, Flags: {LocomotionFlags}\n" +
+               $"Combat Main: {CombatMain}, Flags: {CombatFlags}\n" +
+               $"ActionState Flags: {ActionFlags}\n" +
+               $"Interaction Flags: {InteractionFlags}";
     }
 
     // 필요 시 개별 로그 메서드도 제공

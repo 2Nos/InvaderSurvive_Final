@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class MoveState : PlayerMainState
 {
-    protected override LocomotionStateFlags LocomotionFlag => LocomotionStateFlags.Moving;
+    protected override LocomotionSubFlags LocomotionFlag => LocomotionSubFlags.None;
     public MoveState(PlayerLocomotion locomotion) : base(locomotion)
     {
         m_locomotion = locomotion;

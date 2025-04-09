@@ -27,22 +27,22 @@ public class PlayerSubState : MonoBehaviour
     protected virtual void HandleFlagStateChanges()
     {
         // 이동 중이 아닌 경우 이동 플래그 제거
-        if (!m_inputManager.IsAiming)
-            m_flagManager.UnsetLocomotionFlag(LocomotionStateFlags.Moving);
+        /*if (!m_inputManager.IsAiming)
+            m_flagManager.UnsetLocomotionFlag(LocomotionSubFlags.Moving);
         else
-            m_flagManager.SetLocomotionFlag(LocomotionStateFlags.Moving);
+            m_flagManager.SetLocomotionFlag(LocomotionSubFlags.Moving);
 
         // 스프린트 처리
         if (m_inputManager.IsSprinting)
-            m_flagManager.SetLocomotionFlag(LocomotionStateFlags.Sprinting);
+            m_flagManager.SetLocomotionFlag(LocomotionSubFlags.Sprinting);
         else
-            m_flagManager.UnsetLocomotionFlag(LocomotionStateFlags.Sprinting);
+            m_flagManager.UnsetLocomotionFlag(LocomotionSubFlags.Sprinting);
 
         // 앉기 처리
         if (m_inputManager.IsCrouching)
-            m_flagManager.SetLocomotionFlag(LocomotionStateFlags.Crouching);
+            m_flagManager.SetLocomotionFlag(LocomotionSubFlags.Crouching);
         else
-            m_flagManager.UnsetLocomotionFlag(LocomotionStateFlags.Crouching);
+            m_flagManager.UnsetLocomotionFlag(LocomotionSubFlags.Crouching);
 
         // 조준
         if (m_inputManager.IsAiming)
@@ -51,15 +51,15 @@ public class PlayerSubState : MonoBehaviour
             m_flagManager.UnsetCombatFlag(CombatStateFlags.Aiming);
 
         // 근접 공격
-        /*if (m_inputManager.IsMeleePressed || )
+        *//*if (m_inputManager.IsMeleePressed || )
             m_flagManager.SetCombatFlag(CombatStateFlags.MeleeAttacking);
         else
-            m_flagManager.UnsetCombatFlag(CombatStateFlags.MeleeAttacking);*/
+            m_flagManager.UnsetCombatFlag(CombatStateFlags.MeleeAttacking);*//*
 
         // 낙하/점프 감지 (예시, 실제 점프 처리 로직과 분리 필요)
         if (!m_locomotion.IsGround())
-            m_flagManager.SetLocomotionFlag(LocomotionStateFlags.InAir);
+            m_flagManager.SetLocomotionFlag(LocomotionSubFlags.InAir);
         else
-            m_flagManager.UnsetLocomotionFlag(LocomotionStateFlags.InAir);
+            m_flagManager.UnsetLocomotionFlag(LocomotionSubFlags.InAir);*/
     }
 }
