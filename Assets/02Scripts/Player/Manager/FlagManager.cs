@@ -129,4 +129,12 @@ public class FlagManager : MonoBehaviour
     {
         Debug.Log(DumpAllStates());
     }
+
+    // 상태 전이 관리
+    public void ChangeToMoving(LocomotionMainState locomotionMainState, LocomotionSubFlags clerarFlag, LocomotionSubFlags setFlag)
+    {
+        LocomotionMain = locomotionMainState;
+        ClearLocomotionFlag(clerarFlag);
+        SetLocomotionFlag(setFlag);
+    }
 }

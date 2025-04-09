@@ -1,5 +1,16 @@
 using UnityEngine;
 
+
+public static class AnimKeys
+{
+    public const string Idle = "IsIdle";
+    public const string Move = "IsMoving";
+    public const string Slide = "IsSliding";
+    public const string InAir = "IsInAir";
+    public const string InClimb = "IsClimbing";
+    public const string WallRun = "IsWallRunning";
+}
+
 [RequireComponent(typeof(Animator))]
 public class PlayerAnimationManager : MonoBehaviour
 {
@@ -7,14 +18,59 @@ public class PlayerAnimationManager : MonoBehaviour
     [SerializeField] Animator m_animator;
     private readonly int m_moveSpeedHashX = Animator.StringToHash("MoveDirectionX");
     private readonly int m_moveSpeedHashY = Animator.StringToHash("MoveDirectionY");
-    private readonly int m_isMovingHash = Animator.StringToHash("IsMoving");
-    private readonly int m_isAimingHash = Animator.StringToHash("IsAiming");
-    private readonly int m_isSprintingHash = Animator.StringToHash("IsSprinting");
-    private readonly int m_isCrouchingHash = Animator.StringToHash("IsCrouching");
-    private readonly int m_isJumpingHash = Animator.StringToHash("IsJumping");
-    private readonly int m_isDodgingHash = Animator.StringToHash("IsDodging");
-    private readonly int m_isRelodingHash = Animator.StringToHash("IsReloding");
-    private readonly int m_isUsingSkillHash = Animator.StringToHash("IsUsingSkill");
+
+    /// <summary>
+    /// 애니메이션 Bool 상태 설정
+    /// </summary>
+    public void SetBool(string paramName, bool value)
+    {
+        if (!m_animator) return;
+        m_animator.SetBool(paramName, value);
+    }
+    /// <summary>
+    /// 애니메이션 Float 값 설정 (ex. 속도 등)
+    /// </summary>
+    public void SetFloat(string paramName, float value)
+    {
+        if (!m_animator) return;
+        m_animator.SetFloat(paramName, value);
+    }
+
+    /// <summary>
+    /// 애니메이션 Int 값 설정
+    /// </summary>
+    public void SetInt(string paramName, int value)
+    {
+        if (!m_animator) return;
+        m_animator.SetInteger(paramName, value);
+    }
+    /// <summary>
+    /// 애니메이션 Trigger 설정
+    /// </summary>
+    public void SetTrigger(string paramName)
+    {
+        if (!m_animator) return;
+        m_animator.SetTrigger(paramName);
+    }
+
+    /// <summary>
+    /// Trigger 리셋
+    /// </summary>
+    public void ResetTrigger(string paramName)
+    {
+        if (!m_animator) return;
+        m_animator.ResetTrigger(paramName);
+    }
+
+    /// <summary>
+    /// 현재 애니메이션 상태 이름 반환
+    /// </summary>
+    public string GetCurrentStateName(int layerIndex = 0)
+    {
+        if (!m_animator) return string.Empty;
+        AnimatorStateInfo stateInfo = m_animator.GetCurrentAnimatorStateInfo(layerIndex);
+        return stateInfo.IsName("") ? "" : stateInfo.shortNameHash.ToString();
+    }
 
     public void UpdateMovementAnimation(Vector3 inputMovement)
     {
@@ -22,6 +78,10 @@ public class PlayerAnimationManager : MonoBehaviour
         m_animator.SetFloat(m_moveSpeedHashY, inputMovement.y);
     }
 
+    /*public void SetIdle(bool isIdle)
+    {
+        m_animator.SetBool(m_isIdleHash, isIdle);
+    }
     public void SetMoving(bool isMoving)
     {
         m_animator.SetBool(m_isMovingHash, isMoving);
@@ -57,10 +117,10 @@ public class PlayerAnimationManager : MonoBehaviour
         m_animator.SetBool(m_isUsingSkillHash,isCrouching);
     }
 
-    public void PlayAnimation(string animationName)
+    public void SetWallRun(bool isWallRunning)
     {
-        m_animator.Play(animationName);
-    }
+        m_animator.SetBool(m_isWallRunningHash, isWallRunning);
+    }*/
 
     public void CrossFadeAnimation(string animationName, float transitionDuration = 0.25f)
     {

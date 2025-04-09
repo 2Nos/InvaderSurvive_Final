@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class JumpState : PlayerMainState
+public class JumpState : PlayerState
 {
     public JumpState(PlayerLocomotion locomotion) : base(locomotion) { }
     public override void Exit()
