@@ -3599,10 +3599,10 @@ MonoBehaviour:
   m_Data:
     m_ConstrainedObject: {fileID: 3071002493374271197}
     m_SourceObjects:
-      m_Length: 0
+      m_Length: 1
       m_Item0:
         transform: {fileID: 0}
-        weight: 0
+        weight: 1
       m_Item1:
         transform: {fileID: 0}
         weight: 0
@@ -4026,10 +4026,10 @@ MonoBehaviour:
   m_Data:
     m_ConstrainedObject: {fileID: 945600425038381645}
     m_SourceObjects:
-      m_Length: 0
+      m_Length: 1
       m_Item0:
         transform: {fileID: 0}
-        weight: 0
+        weight: 1
       m_Item1:
         transform: {fileID: 0}
         weight: 0
@@ -4527,9 +4527,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8986481944692925303}
-  - component: {fileID: 111225691601654637}
-  - component: {fileID: 1334225190433943041}
-  - component: {fileID: 494138827876591656}
+  - component: {fileID: 3186003373738629355}
+  - component: {fileID: 4961599121207941379}
+  - component: {fileID: 8403530701227816454}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -4554,7 +4554,57 @@ Transform:
   - {fileID: 6220377961384533467}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &111225691601654637
+--- !u!54 &3186003373738629355
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4819936667448075010}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 80
+  m_CollisionDetection: 0
+--- !u!136 &4961599121207941379
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4819936667448075010}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.25
+  m_Height: 1.5
+  m_Direction: 1
+  m_Center: {x: 0, y: -0.25, z: 0}
+--- !u!114 &8403530701227816454
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4563,43 +4613,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 4819936667448075010}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6c3beecb9ece9374e90ba2abaee4cefa, type: 3}
+  m_Script: {fileID: 11500000, guid: 539ec5c01e9fa1f46a6aeb3d713eb5ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_upperBodyTransform: {fileID: 8986481944692925303}
-  m_weaponHolder: {fileID: 6220377961384533467}
-  m_upperBodyRotationSpeed: 10
-  m_lowerBodyRotationSpeed: 10
-  m_normalWeaponPosition: {x: 0.5, y: 1.2, z: 0.5}
-  m_aimingWeaponPosition: {x: 0.5, y: 1.5, z: 0.5}
-  m_weaponPositionLerpSpeed: 10
---- !u!114 &1334225190433943041
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4819936667448075010}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b099ee0bc3a85cb419027e4c9de32682, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &494138827876591656
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4819936667448075010}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 88e937426b1efda46a9b87872f5ae662, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_moveSpeed: 2
-  m_sprintSpeed: 8
-  m_crouchSpeed: 2.5
 --- !u!1 &4837562861364328441
 GameObject:
   m_ObjectHideFlags: 0
@@ -5872,10 +5888,10 @@ MonoBehaviour:
   m_Data:
     m_ConstrainedObject: {fileID: 6250788023483179299}
     m_SourceObjects:
-      m_Length: 0
+      m_Length: 1
       m_Item0:
         transform: {fileID: 0}
-        weight: 0
+        weight: 1
       m_Item1:
         transform: {fileID: 0}
         weight: 0
@@ -6462,7 +6478,7 @@ Animator:
   m_Controller: {fileID: 9100000, guid: 07ad3306f42653647b521a2b4e0fac26, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
-  m_ApplyRootMotion: 1
+  m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_AnimatePhysics: 0

@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
-    [SerializeField] PlayerInputManager m_inputManager;
+    //[SerializeField] InputManager m_inputManager;
+    [SerializeField] PlayerCore m_PlayerCore;
 
     [Header("타겟 설정")]
     [SerializeField] Transform m_aimPos;       // 캐릭터 Transform
@@ -20,6 +21,8 @@ public class CameraManager : MonoBehaviour
 
     private float m_pitch = 0f;// 현재 X축 회전값
     public float m_yaw { get; private set; }// 현재 Y축 회전값
+
+    
 
     private void LateUpdate()
     {
@@ -44,8 +47,8 @@ public class CameraManager : MonoBehaviour
 
     private void HandleRotation()
     {
-        float mouseX = m_inputManager.LookInput.x;
-        float mouseY = m_inputManager.LookInput.y;
+        float mouseX = m_PlayerCore.GetInputManager().LookInput.x;
+        float mouseY = m_PlayerCore.GetInputManager().LookInput.y;
 
         m_yaw += mouseX * m_rotationSpeed;
         m_pitch -= mouseY * m_rotationSpeed;
