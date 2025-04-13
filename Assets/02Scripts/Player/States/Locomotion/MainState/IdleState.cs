@@ -1,16 +1,28 @@
 using UnityEngine;
 
-public class IdleState : LocomotionStateBase
+public class IdleState : LocomotionBaseState
 {
-    private PlayerLocomotion playerLocomotion;
+    public IdleState(PlayerCore playerCore) : base(playerCore){}
 
-    public IdleState(PlayerLocomotion playerLocomotion)
+    //현재 상태 정의
+    protected override LocomotionMainState GetMainState() => LocomotionMainState.Idle;
+    //현재 애니메이션
+    protected override string SetAnimationBoolName() => AniKeys.Idle;
+
+    public override void Enter()
     {
-        this.playerLocomotion = playerLocomotion;
+        base.Enter();
     }
 
-    protected override LocomotionMainState GetMainState()
+    public override void Update()
     {
-        throw new System.NotImplementedException();
+        base.Update();
+
+
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
     }
 }

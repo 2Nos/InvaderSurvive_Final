@@ -1,6 +1,6 @@
-public interface ICombatState
+public abstract class CombatBaseState
 {
-    void Enter();
-    void Update();
-    void Exit();
+    public virtual void Enter() { }
+    public virtual void Update() { }
+    public virtual void Exit() { }
 }

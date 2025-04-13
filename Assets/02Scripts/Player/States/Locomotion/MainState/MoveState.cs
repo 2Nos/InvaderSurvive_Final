@@ -1,13 +1,11 @@
 using UnityEngine;
 
-public class MoveState : LocomotionStateBase
+public class MoveState : LocomotionBaseState
 {
-   // public MoveState(PlayerLocomotion locomotion) : base(locomotion)
-    //{
-   // }
+    public MoveState(PlayerCore playerCore) : base(playerCore){}
 
-    protected override LocomotionMainState GetMainState()
-    {
-        throw new System.NotImplementedException();
-    }
+    protected override LocomotionMainState GetMainState() => LocomotionMainState.Moving;
+    
+
+    protected override string SetAnimationBoolName() => AniKeys.Move;
 }

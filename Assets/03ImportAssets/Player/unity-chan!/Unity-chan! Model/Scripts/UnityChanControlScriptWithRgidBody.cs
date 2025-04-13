@@ -46,7 +46,7 @@ namespace UnityChan
 		
 		// アニメーター各ステートへの参照
 		static int idleState = Animator.StringToHash ("Base Layer.Idle");
-		static int locoState = Animator.StringToHash ("Base Layer.Locomotion");
+		static int locoState = Animator.StringToHash ("Base Layer.m_Locomotion");
 		static int jumpState = Animator.StringToHash ("Base Layer.Jump");
 		static int restState = Animator.StringToHash ("Base Layer.Rest");
 

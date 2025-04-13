@@ -1,20 +1,10 @@
 using UnityEngine;
 
-public class InAirState : LocomotionStateBase
+public class InAirState : LocomotionBaseState
 {
-    private PlayerLocomotion locomotion;
+    public InAirState(PlayerCore playerCore) : base(playerCore){}
 
-    public InAirState(PlayerLocomotion locomotion)
-    {
-        this.locomotion = locomotion;
-    }
-
-    //public InAirState(PlayerLocomotion locomotion) : base(locomotion)
-    //{
-    // }
-
-    protected override LocomotionMainState GetMainState()
-    {
-        throw new System.NotImplementedException();
-    }
+    protected override LocomotionMainState GetMainState() => LocomotionMainState.InAir;
+    protected override string SetAnimationBoolName() => AniKeys.InAir;
+    
 }

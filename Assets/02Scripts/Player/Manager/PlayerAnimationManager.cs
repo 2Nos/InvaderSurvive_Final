@@ -1,7 +1,7 @@
 using UnityEngine;
 
 
-public static class AnimKeys
+public static class AniKeys
 {
     public const string Idle = "IsIdle";
     public const string Move = "IsMoving";

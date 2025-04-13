@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class JumpCondition : IStateTransitionCondition
+/*public class JumpCondition : IStateTransitionCondition
 {
     private PlayerLocomotion locomotion;
 
@@ -16,8 +16,8 @@ public class JumpCondition : IStateTransitionCondition
         return Input.GetKeyDown(KeyCode.Space);
     }
 
-    public LocomotionStateBase GetNextState()
+    public LocomotionBaseState GetNextState()
     {
         return new InAirState(locomotion);
     }
-}
+}*/

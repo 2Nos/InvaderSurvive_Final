@@ -162,8 +162,8 @@ public class MainStateAndSubFlagsManager : MonoBehaviour
     // 전체 상태 출력
     public string DumpAllStates()
     {
-        return $"Locomotion Main: {m_LocomotionMain}, Flags: {m_LocomotionFlags}\n" +
-               $"Combat Main: {m_CombatMain}, Flags: {m_CombatFlags}\n" +
+        return $"m_Locomotion Main: {m_LocomotionMain}, Flags: {m_LocomotionFlags}\n" +
+               $"m_Combat Main: {m_CombatMain}, Flags: {m_CombatFlags}\n" +
                $"ActionState Flags: {m_ActionFlags}\n" +
                $"Interaction Flags: {m_InteractionFlags}";
     }

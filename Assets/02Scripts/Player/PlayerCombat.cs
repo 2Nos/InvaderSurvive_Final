@@ -1,26 +1,24 @@
 public class PlayerCombat
 {
-    private ICombatState currentState;
-    private readonly PlayerCore core;
+    private readonly PlayerCore m_core;
+    private CombatBaseState m_currentState;
 
     public PlayerCombat(PlayerCore core)
     {
-        this.core = core;
-        ChangeState(new NoCombatState(this));
+        this.m_core = core;
+        //ChangeState(new NoCombatState(this));
     }
 
     public void Update()
     {
-        currentState?.Update();
+        m_currentState?.Update();
     }
 
-    public void ChangeState(ICombatState newState)
+    public void ChangeState(CombatBaseState newState)
     {
-        currentState?.Exit();
-        currentState = newState;
-        currentState?.Enter();
+        m_currentState?.Exit();
+        m_currentState = newState;
+        m_currentState?.Enter();
     }
 
-    public MainStateAndSubFlagsManager Flags => core.GetFlagManager();
-    //public PlayerLocomotion Locomotion => core.GetLocm;
 }
