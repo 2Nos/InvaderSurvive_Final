@@ -46,8 +46,10 @@ public class CameraManager : MonoBehaviour
 
     private void HandleRotation()
     {
-        float mouseX = m_PlayerCore.m_InputManager.LookInput.x;
-        float mouseY = m_PlayerCore.m_InputManager.LookInput.y;
+        float mouseX = m_PlayerCore.m_InputManager.m_LookInput.x;
+        float mouseY = m_PlayerCore.m_InputManager.m_LookInput.y;
+
+
 
         m_yaw += mouseX * m_rotationSpeed;
         m_pitch -= mouseY * m_rotationSpeed;

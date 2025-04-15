@@ -12,12 +12,12 @@ public class IdleState : LocomotionBaseState
     public override void Enter()
     {
         base.Enter();
+        Debug.Log("IdleState Enter");
     }
 
     public override void Update()
     {
         base.Update();
-
 
     }
 

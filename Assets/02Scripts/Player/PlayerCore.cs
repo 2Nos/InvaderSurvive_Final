@@ -1,10 +1,10 @@
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Windows;
+using DUS.Joystick;
+
 
 [RequireComponent(typeof(CapsuleCollider))]
 [RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(InputManager))] // InputManager컴포넌트를 종속성으로 PlayerCore있는 곳에 자동으로 추가
+[RequireComponent(typeof(PlayerInputManager))] // InputManager컴포넌트를 종속성으로 PlayerCore있는 곳에 자동으로 추가
 public class PlayerCore : MonoBehaviour
 {
     /*#region SingleTon
@@ -26,7 +26,8 @@ public class PlayerCore : MonoBehaviour
     public PlayerLocomotion m_Locomotion { get; private set; }
     public PlayerCombat m_Combat { get; private set; }
 
-    public InputManager m_InputManager { get; private set; }
+    public PlayerInputManager m_InputManager { get; private set; }
+    public DUS.Joystick.Joystick m_Joystick { get; private set; } // 안드로이드 조이스틱
     public MainStateAndSubFlagsManager m_StateFlagManager { get; private set; }
     public PlayerAnimationManager m_AnimationManager { get; private set; }
     public CameraManager m_CameraManager { get; private set;}
@@ -49,7 +50,7 @@ public class PlayerCore : MonoBehaviour
     private void Awake()
     {
         //m_Locomotion 생성자 전에 먼저 Get으로 모듈을 찾아놓고 있어야함
-        m_InputManager = GetComponent<InputManager>(); // 또는 직접 주입
+        m_InputManager = GetComponent<PlayerInputManager>(); // 또는 직접 주입
         m_AnimationManager = GetComponentInChildren<PlayerAnimationManager>();
         m_Rigidbody = GetComponent<Rigidbody>();
         m_CapsuleCollider = GetComponent<CapsuleCollider>();

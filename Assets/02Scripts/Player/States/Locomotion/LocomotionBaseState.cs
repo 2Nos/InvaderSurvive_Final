@@ -20,7 +20,6 @@ public abstract class LocomotionBaseState
         //애니메이션 파라미터 On
         if (SetAnimationBoolName() != null)
             m_PlayerCore.m_AnimationManager.SetBool(SetAnimationBoolName(), true);
-
     }
 
     public virtual void Update()

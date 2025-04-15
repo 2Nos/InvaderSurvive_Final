@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "InvaderSuvive_Final.sln"
+    "dotnet.defaultSolution": "InvaderSurvive_Final.sln"
 }

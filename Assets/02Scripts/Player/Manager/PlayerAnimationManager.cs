@@ -4,7 +4,7 @@ using UnityEngine;
 public static class AniKeys
 {
     public const string Idle = "IsIdle";
-    public const string Move = "IsMoving";
+    public const string Move = "m_IsMoving";
     public const string Slide = "IsSliding";
     public const string InAir = "IsInAir";
     public const string InClimb = "IsClimbing";

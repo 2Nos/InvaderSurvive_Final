@@ -46,7 +46,7 @@ public class PlayerLocomotion
     // 이동 처리
     public void HandleMove()
     {
-        if (!m_playerCore.m_InputManager.IsMoving)
+        if (!m_playerCore.m_InputManager.m_IsMoving)
         {
             m_moveDirection = Vector3.zero;
             m_currentMoveSpeed = 0f;
@@ -56,12 +56,12 @@ public class PlayerLocomotion
         }
         var prevMoveSpeed = m_currentMoveSpeed;
         // 이동 속도 결정
-        m_currentMoveSpeed = m_playerCore.m_InputManager.IsSprinting ? m_playerCore.m_sprintSpeed :
-                           m_playerCore.m_InputManager.IsCrouching ? m_playerCore.m_crouchSpeed :
+        m_currentMoveSpeed = m_playerCore.m_InputManager.m_IsSprinting ? m_playerCore.m_sprintSpeed :
+                           m_playerCore.m_InputManager.m_IsCrouching ? m_playerCore.m_crouchSpeed :
                            m_playerCore.m_moveSpeed;
 
         // 이동 방향 계산
-        Vector2 moveInput = m_playerCore.m_InputManager.MovementInput;
+        Vector2 moveInput = m_playerCore.m_InputManager.m_MovementInput;
 
         //뱡향 선정(transform의 로컬 방향으로 움직임 제어 및 노멀라이즈)
         m_moveDirection = Vector3.Normalize(m_playerCore.transform.right * moveInput.x + m_playerCore.transform.forward * moveInput.y);
@@ -83,14 +83,14 @@ public class PlayerLocomotion
         m_playerCore.transform.position += m_moveDirection * Time.deltaTime;*/
         //==============================================================
         //이동 애니메이션
-        m_playerCore.m_AnimationManager.UpdateMovementAnimation(m_playerCore.m_InputManager.MovementInput);
+        m_playerCore.m_AnimationManager.UpdateMovementAnimation(m_playerCore.m_InputManager.m_MovementInput);
     }
 
     // 회전 처리
     public void HandleRotation()
     {
         // 나중에 적용
-        /*Vector3 lookDirection = new Vector3(m_InputManager.LookInput.x, 0, m_InputManager.LookInput.y);
+        /*Vector3 lookDirection = new Vector3(m_InputManager.m_LookInput.x, 0, m_InputManager.m_LookInput.y);
 
         if(lookDirection.sqrMagnitude > 0.01f)
         {
