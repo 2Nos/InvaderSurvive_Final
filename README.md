@@ -11,12 +11,12 @@
 <br>
 
 [카메라 하이어라키 구조]
-Player
-├── target_FollowCam (View 높이)
-
-CameraRig (CameraRigManager, target_FollowCam와 글로벌 위치 동일하게)
-├── Pivot(Empty, 어깨와의 거리)
-│   └── MainCamera(실제 카메라, Pivot과의 거리 유지)
+Player<br>
+├── target_FollowCam (View 높이)<br>
+<br>
+CameraRig (CameraRigManager, target_FollowCam와 글로벌 위치 동일하게)<br>
+├── Pivot(Empty, 어깨와의 거리)<br>
+│   └── MainCamera(실제 카메라, Pivot과의 거리 유지)<br>
 
 [카메라 회전]
 - 평소엔 정면 유지
