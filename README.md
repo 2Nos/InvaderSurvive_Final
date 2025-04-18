@@ -10,8 +10,7 @@
 ![image](https://github.com/user-attachments/assets/6fa25375-89e7-4fba-b386-521f75e6e891) 
 <br>
 
-[카메라 회전]<br>
-<br>
+[카메라 회전]
 - 평소엔 정면 유지
 - 에임 시 살짝 Lerp 회전해서 에임 방향 응시
 - 에임을 해제하면 천천히 원래 정면 방향으로 복귀
