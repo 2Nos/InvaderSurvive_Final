@@ -84,10 +84,10 @@ namespace DUS.Joystick
             switch (m_joystickType)
             {
                 case JoystickType.Move:
-                    m_PlayerInputManager.SetInput(inputDirection, JoystickType.Move);
+                    m_PlayerInputManager.SetMovementAndLookInput(inputDirection, JoystickType.Move);
                     break;
                 case JoystickType.Rotate:
-                    m_PlayerInputManager.SetInput(inputDirection, JoystickType.Rotate);
+                    m_PlayerInputManager.SetMovementAndLookInput(inputDirection, JoystickType.Rotate);
                     break;
             }
             m_joystickLeverImange.color = new Color32(141, 250, 255, 255);
@@ -103,10 +103,10 @@ namespace DUS.Joystick
             switch (m_joystickType)
             {
                 case JoystickType.Move:
-                    m_PlayerInputManager.SetInput(inputDirection, JoystickType.Move);
+                    m_PlayerInputManager.SetMovementAndLookInput(inputDirection, JoystickType.Move);
                     break;
                 case JoystickType.Rotate:
-                    m_PlayerInputManager.SetInput(inputDirection, JoystickType.Rotate);
+                    m_PlayerInputManager.SetMovementAndLookInput(inputDirection, JoystickType.Rotate);
                     break;
             }
         }

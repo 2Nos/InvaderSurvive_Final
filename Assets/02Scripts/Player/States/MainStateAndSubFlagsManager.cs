@@ -6,29 +6,29 @@ using System;
 /// <summary>
 /// 메인 이동 상태
 /// 항상 단일(MainState들중 하나의, Flags 적용x) 상태로 유지 + Flags 복수개 선택
-/// Moving + m_LocomotionFlags(Sprinting + Aming)
+/// Move + m_LocomotionFlags(FalgButtonGroupManager + Aming)
 /// </summary>
 public enum LocomotionMainState
 {
     Idle = 0,           // Idle
-    Moving = 1,         // 기본 이동
+    Move = 1,         // 기본 이동
     InAir = 2,          // 공중 (점프/낙하)
-    Sliding = 3,        // 슬라이딩
-    Climbing = 4,       // 등반
-    WallRunning = 5     // 벽 달리기
+    Slide = 3,        // 슬라이딩
+    Climb = 4,       // 등반
+    WallRun = 5     // 벽 달리기
 }
 
 /// <summary>
 /// Flags는 복수의 열거형 선택이 가능한 기능. 즉, 복수 상태가 가능
 /// Flags는 2의 제곱수나 2의 제곱수 조합을 사용하여 선언해야함
-/// None =0, Sprinting = 1, Croucning = 2, 4,8 이런식 보다는 쉬프트연)
+/// None =0, FalgButtonGroupManager = 1, Croucning = 2, 4,8 이런식 보다는 쉬프트연)
 /// </summary>
 [Flags]
 public enum LocomotionSubFlags
 {
     None = 0,
-    Sprinting = 1 << 1,         // 달리기
-    Crouching = 1 << 2,         // 앉기
+    Run = 1 << 1,         // 달리기
+    Crouch = 1 << 2,         // 앉기
 }
 
 /// <summary>
@@ -38,13 +38,13 @@ public enum LocomotionSubFlags
 public enum ActionStateFlags
 {
     None = 0,
-    Dodging = 1 << 0,           // 구르기(회피기)
+    Dodge = 1 << 0,           // 구르기(회피기)
     Staggered = 1 << 1,         // 피격 경직 같은 상태
     Knockback = 1 << 2          // 넉백
 }
 #endregion
 
-#region ----------------------------- Combat
+#region ======================================== Combat
 /// <summary>
 /// 전투상태일 때의 메인 상태
 /// </summary>
@@ -75,10 +75,10 @@ public enum AbilityMainState
     UsingAbility = 1,
     UsingUltimate = 2
 }
-#endregion -----------------------------/Combat
+#endregion ======================================== /Combat
 
 
-#region ----------------------------- Interaction
+#region ======================================== Interaction
 /// <summary>
 /// 상호작용 상태
 /// </summary>
@@ -92,7 +92,7 @@ public enum InteractionFlags
     Crafting = 1 << 3,       // 제작
     Upgrading = 1 << 4       // 장비 강화
 }
-#endregion -----------------------------/Interaction
+#endregion ======================================== /Interaction
 
 public class MainStateAndSubFlagsManager : MonoBehaviour
 {
@@ -124,40 +124,40 @@ public class MainStateAndSubFlagsManager : MonoBehaviour
     }
 
     //[선언]
-    #region ----------------------------- Locomotion
+    #region ======================================== Locomotion
     //// Flags만 Setter Methods
     private LocomotionMainState m_locomotionMain { get; set; } = LocomotionMainState.Idle;
     private LocomotionSubFlags m_LocomotionFlags = LocomotionSubFlags.None;
     public void SetLocomotionFlag(LocomotionSubFlags flag) => m_LocomotionFlags |= flag;      // 해당 상태로 설정
     public bool HasLocomotionFlag(LocomotionSubFlags flag) => (m_LocomotionFlags & flag) != 0;
     public void ClearLocomotionFlag(LocomotionSubFlags flag) => m_LocomotionFlags &= ~flag;   // 상태 설정 제거
-    #endregion --------------------------
+    #endregion ======================================== /Locomotion
 
-    #region -------------------------- Combat
+    #region ======================================== Combat
     private CombatMainState m_combatMain = CombatMainState.None;
     private CombatSubFlags m_CombatFlags = CombatSubFlags.None;
     public void SetCombatFlag(CombatSubFlags flag) => m_CombatFlags |= flag;
     public bool HasCombatFlag(CombatSubFlags flag) => (m_CombatFlags & flag) != 0;
     public void ClearCombatFlag(CombatSubFlags flag) => m_CombatFlags &= ~flag;
-    #endregion --------------------------
+    #endregion ======================================== /Combat
 
-    #region -------------------------- Ability
+    #region ======================================== Ability
     private AbilityMainState m_abilityMain { get; set; } = AbilityMainState.None;
-    #endregion --------------------------
+    #endregion ======================================== /Ability
 
-    #region -------------------------- Action
+    #region ======================================== Action
     private ActionStateFlags m_actionFlags = ActionStateFlags.None;
     public void SetActionStateFlags(ActionStateFlags flag) => m_actionFlags |= flag;
     public bool HasActionStateFlags(ActionStateFlags flag) => (m_actionFlags & flag) != 0;
     public void ClearActionStateFlags(ActionStateFlags flag) => m_actionFlags &= ~flag;
-    #endregion --------------------------
+    #endregion ======================================== /Action
 
-    #region -------------------------- Interaction
+    #region ======================================== Interaction
     private InteractionFlags m_interactionFlags = InteractionFlags.None;
     public void SetInteractionFlag(InteractionFlags flag) => m_interactionFlags |= flag;
     public bool HasInteractionFlag(InteractionFlags flag) => (m_interactionFlags & flag) != 0;
     public void ClearInteractionFlag(InteractionFlags flag) => m_interactionFlags &= ~flag;
-    #endregion --------------------------
+    #endregion ======================================== /Interaction
 
     // 전체 상태 출력
     public string DumpAllStates()
@@ -173,12 +173,4 @@ public class MainStateAndSubFlagsManager : MonoBehaviour
     {
         Debug.Log(DumpAllStates());
     }
-
-    /*// 상태 전이 관리
-    public void ChangeToMoving(LocomotionMainState locomotionMainState, LocomotionSubFlags clerarFlag, LocomotionSubFlags setFlag)
-    {
-        m_locomotionMain = locomotionMainState;
-        ClearLocomotionFlag(clerarFlag);
-        SetLocomotionFlag(setFlag);
-    }*/
 }

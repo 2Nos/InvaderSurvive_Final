@@ -4,8 +4,28 @@ public class MoveState : LocomotionBaseState
 {
     public MoveState(PlayerCore playerCore) : base(playerCore){}
 
-    protected override LocomotionMainState GetMainState() => LocomotionMainState.Moving;
-    
+    public override LocomotionMainState EnterState() => LocomotionMainState.Move;
+    public override void Enter()
+    {
+        base.Enter();
+        Debug.Log("MoveState Enter");
+    }
 
-    protected override string SetAnimationBoolName() => AniKeys.Move;
+    public override void Update()
+    {
+        base.Update();
+        if (!m_PlayerCore.m_InputManager.m_IsMove)
+        {
+            SetMainState(LocomotionMainState.Idle);
+        }
+
+        m_PlayerCore.m_Locomotion.UpdateLocomotionFlagAnimation();
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+        Debug.Log("MoveState Exit");
+    }
+
 }

@@ -1,46 +1,44 @@
+// ========================================250415
+// 
+
+// ========================================250410
+// Locomotion, Combat에 메인 단일 상태가 필요한 메인인 상태들에 대해선 MainState로 관리
+// IsAiming, IsSprinting, IsCrouching은 같은 복수가 가능한 State들은 SubFlags로 관리
+
+// ========================================
 using UnityEngine;
 using DUS.Joystick;
-
-
 [RequireComponent(typeof(CapsuleCollider))]
 [RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(MainStateAndSubFlagsManager))]
 [RequireComponent(typeof(PlayerInputManager))] // InputManager컴포넌트를 종속성으로 PlayerCore있는 곳에 자동으로 추가
 public class PlayerCore : MonoBehaviour
 {
-    /*#region SingleTon
-    private static PlayerCore instance;
-    public static PlayerCore Instance
-    {
-        get { return instance; }
-        set
-        {
-            if (instance == null)
-            {
-                instance = FindObjectOfType<PlayerCore>();
-            }
-        }
-    }
-    #endregion*/
-
     #region ======================================== Module
+    public PlayerInputManager m_InputManager { get; private set; }
+    public MainStateAndSubFlagsManager m_StateFlagManager { get; private set; }
+    public PlayerAnimationManager m_AnimationManager { get; private set; }
+    public CameraRigManager m_CameraManager { get; private set; }
     public PlayerLocomotion m_Locomotion { get; private set; }
     public PlayerCombat m_Combat { get; private set; }
 
-    public PlayerInputManager m_InputManager { get; private set; }
-    public DUS.Joystick.Joystick m_Joystick { get; private set; } // 안드로이드 조이스틱
-    public MainStateAndSubFlagsManager m_StateFlagManager { get; private set; }
-    public PlayerAnimationManager m_AnimationManager { get; private set; }
-    public CameraManager m_CameraManager { get; private set;}
+
 
     #endregion ======================================== /Module
 
     #region ======================================== Player Value
-    [Header("Player Value")]
-    public float m_moveSpeed; //{ get { return m_moveSpeed; } private set { if (value == 0) m_moveSpeed = 2.0f; } }
-    public float m_sprintSpeed; //{ get { return m_sprintSpeed; } private set { if (value == 0) m_sprintSpeed = 8.0f; } }
-    public float m_crouchSpeed; //{ get { return m_crouchSpeed; } private set { if (value == 0) m_crouchSpeed = 2.5f; } }
+    [Header("[ Player Move ]")]
+    [Range(1, 10)] public float m_moveSpeed = 5f;
+    [Range(1, 20)] public float m_runSpeed = 15f;
+    [Range(1, 10)] public float m_crouchSpeed = 3f;
+    [Range(1, 10)] public float m_crouchRunSpeed = 9f;
+    [Range(20, 50)] public float m_sprintSpeed = 20f;
 
-    //Rotation 스피드 설정의 경우 Camera에서 조절 끝
+
+    [Header("[ Player Rot ]")]
+    [Range(1, 20)] public float m_rotationSpeed;
+    [Range(1, 50)]public float m_rotationAimSpeed; //에임 상태에서의 회전 속도
+    [Range(1, 60)] public float m_rotationDamping; //회전 감속
     #endregion ======================================== /Player Value
 
     public Rigidbody m_Rigidbody { get; private set; }
@@ -54,17 +52,46 @@ public class PlayerCore : MonoBehaviour
         m_AnimationManager = GetComponentInChildren<PlayerAnimationManager>();
         m_Rigidbody = GetComponent<Rigidbody>();
         m_CapsuleCollider = GetComponent<CapsuleCollider>();
-        m_CameraManager = FindObjectOfType<CameraManager>();
+        m_CameraManager = FindObjectOfType<CameraRigManager>();
 
-        m_StateFlagManager = new MainStateAndSubFlagsManager();
+        //m_StateFlagManager = new MainStateAndSubFlagsManager();
+        m_StateFlagManager = GetComponent<MainStateAndSubFlagsManager>();
 
         m_Locomotion = new PlayerLocomotion(this);
         m_Combat = new PlayerCombat(this);
+    }
+    private void Start()
+    {
+        m_Locomotion.InitState();
     }
 
     private void Update()
     {
         m_Locomotion?.Update();
         m_Combat?.Update();
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.CompareTag("Ground"))
+        {
+            m_Locomotion.SetIsGrounded(true);
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.CompareTag("Ground"))
+        {
+            m_Locomotion.SetIsGrounded(true);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Ground"))
+        {
+            m_Locomotion.SetIsGrounded(false);
+        }
     }
 }
