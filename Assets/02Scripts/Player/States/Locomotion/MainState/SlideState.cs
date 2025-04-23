@@ -2,6 +2,6 @@ using UnityEngine;
 
 public class SlideState : LocomotionBaseState
 {
-    public SlideState(PlayerCore playerCore) : base(playerCore){}
-    public override LocomotionMainState EnterState() => LocomotionMainState.Slide;
+    public SlideState(PlayerLocomotion playerLocomotion) : base(playerLocomotion){}
+    public override LocomotionMainState DetermineStateType() => LocomotionMainState.Slide;
 }

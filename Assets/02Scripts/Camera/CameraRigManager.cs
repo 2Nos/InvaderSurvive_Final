@@ -147,8 +147,8 @@ public class CameraRigManager : MonoBehaviour
     {
         //m_MouseX : 수평 회전(좌우)
         //m_MouseY : 수직 회전(상하)
-        m_MouseX += m_PlayerCore.m_InputManager.m_LookInput.x * m_rotationSensitivity * Time.deltaTime;
-        m_MouseY += m_PlayerCore.m_InputManager.m_LookInput.y * m_rotationSensitivity * Time.deltaTime;
+        m_MouseX += m_PlayerCore.m_InputManager.m_LookInput_LocoM.x * m_rotationSensitivity * Time.deltaTime;
+        m_MouseY += m_PlayerCore.m_InputManager.m_LookInput_LocoM.y * m_rotationSensitivity * Time.deltaTime;
 
         // 수직 회전 제한
         m_MouseY = Mathf.Clamp(m_MouseY, -m_downAngle, m_upAngle); //아래 각도는 음수전환이기에 -

@@ -92,11 +92,7 @@ public class StateButtonGroupManager : MonoBehaviour
                 m_playerCore.m_InputManager.SetIsCrouchInput(isActive);
                 break;
             case StateButtonTpye.Jump:
-                if(m_playerCore.m_Locomotion.m_GetIsGrounded())
-                {
                     m_playerCore.m_InputManager.SetIsInAirInput(isActive);
-                    Debug.Log("Jump Input Set");
-                }
                 break;
             case StateButtonTpye.Dodge:
                 m_playerCore.m_InputManager.SetIsDodgeInput(isActive);

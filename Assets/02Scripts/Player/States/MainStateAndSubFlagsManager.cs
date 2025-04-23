@@ -11,11 +11,12 @@ using System;
 public enum LocomotionMainState
 {
     Idle = 0,           // Idle
-    Move = 1,         // 기본 이동
+    Move = 1,           // 기본 이동
     InAir = 2,          // 공중 (점프/낙하)
-    Slide = 3,        // 슬라이딩
-    Climb = 4,       // 등반
-    WallRun = 5     // 벽 달리기
+    Land = 3,           // 착지
+    Slide = 4,          // 슬라이딩
+    Climb = 5,          // 등반
+    WallRun = 6         // 벽 달리기
 }
 
 /// <summary>

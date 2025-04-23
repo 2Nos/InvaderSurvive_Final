@@ -4,38 +4,33 @@ using UnityEngine;
 
 public abstract class LocomotionBaseState
 {
-    public PlayerCore m_PlayerCore;
+    protected PlayerLocomotion m_PlayerLocomotion;
+    protected PlayerCore m_PlayerCore;
 
-    //playerCore 넘기기 위한 생성자, 상속 시 매개변수로 인해 생성자가 자동 생성이 되지 않기에 받은 곳에서 작성해줘야함.
-    protected LocomotionBaseState(PlayerCore playerCore)
+    public LocomotionBaseState(PlayerLocomotion playerLocomotion)
     {
-        m_PlayerCore = playerCore;
+        m_PlayerLocomotion = playerLocomotion;
+        m_PlayerCore = playerLocomotion.m_PlayerCore;
     }
 
-    /// <summary>
-    /// EnterState-> GetLocomotionMainState -> CheckLocomotionTransition
-    /// </summary>
-    /// <returns></returns>
-    public abstract LocomotionMainState EnterState();
-    protected LocomotionMainState GetLocomotionMainState() => m_PlayerCore.m_StateFlagManager.m_LocomotionMain;
-    public LocomotionBaseState GetCheckTransition() => CheckLocomotionTransition();
+    // 상태 변환 로직 : DetermineStateType-> GetCurrentLocomotionMainState -> TransitionLocomotion
+    // 각 상태에서 DetermineStateType()를 오버라이드하여 상태를 반환하도록 한다.
+    public abstract LocomotionMainState DetermineStateType(); 
+    protected LocomotionMainState? prevLocomotionMainState = null;
 
-    protected LocomotionBaseState Create(LocomotionMainState state, PlayerCore core) =>
-        state switch
-        {
-            LocomotionMainState.Idle => new IdleState(core),
-            LocomotionMainState.Move => new MoveState(core),
-            LocomotionMainState.InAir => new InAirState(core),
-            LocomotionMainState.Slide => new SlideState(core),
-            LocomotionMainState.Climb => new ClimbState(core),
-            LocomotionMainState.WallRun => new WallRunState(core),
-            _ => null,
-        };
+    public LocomotionBaseState GetCheckTransition() => TransitionLocomotion();
 
     public virtual void Enter()
     {
-        m_PlayerCore.m_StateFlagManager.m_LocomotionMain = EnterState();
-        m_PlayerCore.m_Locomotion.UpdateLocomotionMainStateAnimation(EnterState(), true);
+        var state = DetermineStateType();
+        prevLocomotionMainState = state;
+        m_PlayerCore.m_StateFlagManager.m_LocomotionMain = state;
+        m_PlayerLocomotion.UpdateLocomotionMainStateAnimation(state, true);
+    }
+
+    public virtual void FixedUpdate()
+    {
+        // 고정 업데이트는 물리 연산에 사용되므로, 물리 연산이 필요한 경우에만 사용
     }
 
     /// <summary>
@@ -44,21 +39,40 @@ public abstract class LocomotionBaseState
     /// </summary>
     public virtual void Update()
     {
-        Movement(); // 이동 관련 처리
-
-        // 상태 전환 체크
+        Movement();
     }
 
     public virtual void Exit()
     {
-        m_PlayerCore.m_Locomotion.UpdateLocomotionMainStateAnimation(EnterState(), false);
+        var state = DetermineStateType();
+        prevLocomotionMainState = state;
+        m_PlayerLocomotion.UpdateLocomotionMainStateAnimation(state, false);
     }
 
-    // 이동 및 회전 처리
-    protected void Movement()
+    protected virtual void Movement()
     {
-        m_PlayerCore.m_Locomotion.HandleMove();
-        m_PlayerCore.m_Locomotion.HandleRotation();
+        m_PlayerLocomotion.UpdateVerticalMovement();
+        m_PlayerLocomotion.HandleRotation();
+        m_PlayerLocomotion.HandleMove();
+    }
+
+    /// <summary>
+    /// Locomotion ActionState Flags 우선순위 처리
+    /// </summary>
+    /// <returns></returns>
+    protected LocomotionBaseState? IsAction()
+    {
+        // 공통 우선순위: 구르기, 피격 상태 등 전역 ActionState 우선
+
+        /*if (m_PlayerLocomotion.m_StateFlagManager.HasActionStateFlags(ActionStateFlags.Dodge))
+        {
+            return new DodgeState(m_PlayerLocomotion);
+        }
+        if (m_PlayerLocomotion.m_StateFlagManager.HasActionStateFlags(ActionStateFlags.Staggered))
+        {
+            return new StaggeredState(m_PlayerLocomotion);
+        }*/
+        return null;
     }
 
     protected void SetMainState(LocomotionMainState state)
@@ -66,31 +80,69 @@ public abstract class LocomotionBaseState
         m_PlayerCore.m_StateFlagManager.m_LocomotionMain = state;
     }
 
-    // ActionStateFlags 우선순위 처리
-    protected LocomotionBaseState? IsAction()
+    /// <summary>
+    /// 상태 전환 검열
+    /// </summary>
+    protected void CheckLocomotion()
     {
-        // 공통 우선순위: 구르기, 피격 상태 등 전역 ActionState 우선
-        /*if (m_PlayerCore.m_StateFlagManager.HasActionStateFlags(ActionStateFlags.Dodge))
+        if(m_PlayerLocomotion.m_IsProgress) return;
+
+        if (m_PlayerCore.m_InputManager.m_IsInAir_LocoM)
         {
-            return new DodgeState(m_PlayerCore);
+            SetMainState(LocomotionMainState.InAir);
         }
-        if (m_PlayerCore.m_StateFlagManager.HasActionStateFlags(ActionStateFlags.Staggered))
+        else if (m_PlayerCore.m_InputManager.m_IsClimb_LocoM)
         {
-            return new StaggeredState(m_PlayerCore);
-        }*/
-        return null;
+            SetMainState(LocomotionMainState.Climb);
+        }
+        else if (m_PlayerCore.m_InputManager.m_IsWallRun_LocoM)
+        {
+            SetMainState(LocomotionMainState.WallRun);
+        }
+        else if (m_PlayerCore.m_InputManager.m_IsMove_LocoM)
+        {
+            SetMainState(LocomotionMainState.Move);
+        }
+        else
+        {
+            SetMainState(LocomotionMainState.Idle);
+        }
+        m_PlayerLocomotion.UpdateLocomotionFlagAnimation();
     }
 
-    // Locomotion에서 상태 확인하며 전환
-    public LocomotionBaseState? CheckLocomotionTransition()
+    /// <summary>
+    /// 상태 전환 처리
+    /// </summary>
+    /// <returns></returns>
+    public LocomotionBaseState TransitionLocomotion()
     {
         // =================== 상태 전환 처리 ===================
         // ActionStateFlags 우선순위 처리가 끝났으면 일반적인 MainState 체크
+
+        // Todo : LocomotionActionStateFlags에 따라 상태 전환 처리 작성 완료 시 해당 코드로 변경
+        //if (IsAction() is { } actionState) return actionState;
+
         if (IsAction() != null) return IsAction();
 
-        // 다른 상태로 전환 체크
-        return Create(GetLocomotionMainState(), m_PlayerCore);
+        CheckLocomotion();
+
+        var current = m_PlayerCore.m_StateFlagManager.m_LocomotionMain;
+        if (current == prevLocomotionMainState) return m_PlayerLocomotion.m_currentState;
+        
+        Debug.Log($"State Transition: {prevLocomotionMainState} -> {current}");
+        return Create(current);
     }
 
-
+    public LocomotionBaseState Create(LocomotionMainState state) =>
+        state switch
+        {
+            LocomotionMainState.Idle => new IdleState(m_PlayerLocomotion),
+            LocomotionMainState.Move => new MoveState(m_PlayerLocomotion),
+            LocomotionMainState.InAir => new InAirState(m_PlayerLocomotion),
+            LocomotionMainState.Land => new LandState(m_PlayerLocomotion),
+            LocomotionMainState.Slide => new SlideState(m_PlayerLocomotion),
+            LocomotionMainState.Climb => new ClimbState(m_PlayerLocomotion),
+            LocomotionMainState.WallRun => new WallRunState(m_PlayerLocomotion),
+            _ => null,
+        };
 }

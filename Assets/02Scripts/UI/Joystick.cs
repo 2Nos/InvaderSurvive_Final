@@ -143,7 +143,7 @@ namespace DUS.Joystick
 
             float joystickSpeed = 10f;
             // 드래그 위치 (스크린 좌표) - 조이스틱 배경 위치 (월드이지만 Canvas모드가 Overay이기에 스크린 좌표와 동일)
-            Vector3 inputPos = m_PlayerInputManager.m_LookInput; //해상도 상관없이 포지션으로 해결
+            Vector3 inputPos = m_PlayerInputManager.m_LookInput_LocoM; //해상도 상관없이 포지션으로 해결
             if (inputPos == Vector3.zero)
             {
                 InitializeJoyStick();

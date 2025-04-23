@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class WallRunState : LocomotionBaseState
 {
-    public WallRunState(PlayerCore playerCore) : base(playerCore)
+    public WallRunState(PlayerLocomotion playerLocomotion) : base(playerLocomotion)
     {
     }
 
-    public override LocomotionMainState EnterState() => LocomotionMainState.WallRun;
+    public override LocomotionMainState DetermineStateType() => LocomotionMainState.WallRun;
 }

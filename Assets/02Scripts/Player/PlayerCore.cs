@@ -21,7 +21,7 @@ public class PlayerCore : MonoBehaviour
     public CameraRigManager m_CameraManager { get; private set; }
     public PlayerLocomotion m_Locomotion { get; private set; }
     public PlayerCombat m_Combat { get; private set; }
-
+    public LayerMask m_GroundMask;
 
 
     #endregion ======================================== /Module
@@ -33,7 +33,7 @@ public class PlayerCore : MonoBehaviour
     [Range(1, 10)] public float m_crouchSpeed = 3f;
     [Range(1, 10)] public float m_crouchRunSpeed = 9f;
     [Range(20, 50)] public float m_sprintSpeed = 20f;
-
+    [Range(1, 10)] public float m_jumpForce = 5f;
 
     [Header("[ Player Rot ]")]
     [Range(1, 20)] public float m_rotationSpeed;
@@ -54,7 +54,6 @@ public class PlayerCore : MonoBehaviour
         m_CapsuleCollider = GetComponent<CapsuleCollider>();
         m_CameraManager = FindObjectOfType<CameraRigManager>();
 
-        //m_StateFlagManager = new MainStateAndSubFlagsManager();
         m_StateFlagManager = GetComponent<MainStateAndSubFlagsManager>();
 
         m_Locomotion = new PlayerLocomotion(this);
@@ -63,35 +62,12 @@ public class PlayerCore : MonoBehaviour
     private void Start()
     {
         m_Locomotion.InitState();
+        m_Rigidbody.transform.position = Vector3.zero;
     }
 
     private void Update()
     {
         m_Locomotion?.Update();
         m_Combat?.Update();
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if(other.CompareTag("Ground"))
-        {
-            m_Locomotion.SetIsGrounded(true);
-        }
-    }
-
-    private void OnTriggerStay(Collider other)
-    {
-        if (other.CompareTag("Ground"))
-        {
-            m_Locomotion.SetIsGrounded(true);
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Ground"))
-        {
-            m_Locomotion.SetIsGrounded(false);
-        }
     }
 }

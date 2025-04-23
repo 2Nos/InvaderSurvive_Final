@@ -3,7 +3,7 @@ using UnityEngine;
 public class ClimbState : LocomotionBaseState
 {
 
-    public ClimbState(PlayerCore playerCore) : base(playerCore){}
+    public ClimbState(PlayerLocomotion playerLocomotion) : base(playerLocomotion){}
 
-    public override LocomotionMainState EnterState() => LocomotionMainState.Climb;
+    public override LocomotionMainState DetermineStateType() => LocomotionMainState.Climb;
 }

@@ -4,5 +4,5 @@ using UnityEngine;
 {
     public DodgeState(PlayerCore playerCore) : base(playerCore){}
 
-    protected override LocomotionMainState EnterState() => LocomotionMainState.Dodge;
+    protected override LocomotionMainState DetermineStateType() => LocomotionMainState.Dodge;
 }*/

@@ -12,15 +12,41 @@ public class PlayerAnimationManager : MonoBehaviour
     public void SetTrigger(string name) => m_animator.SetTrigger(name);
     public void SetFloat(string name, float value) => m_animator.SetFloat(name, value);
 
-    public void UpdateMovementAnimation(Vector3 inputMovement)
+    private void Awake()
+    {
+        if (m_animator == null)
+        {
+            Debug.LogError("Animator not assigned in PlayerAnimationManager.");
+        }
+    }
+    public void UpdateMovementAnimation(Vector2 inputMovement)
     {
         m_animator.SetFloat(m_moveSpeedHashX, inputMovement.x);
         m_animator.SetFloat(m_moveSpeedHashY, inputMovement.y);
+    }
+
+    public void UpdateFlagAnimation(LocomotionSubFlags flag, bool active)
+    {
+        switch (flag)
+        {
+            case LocomotionSubFlags.Crouch:
+                SetBool("IsCrouch", active);
+                break;
+            case LocomotionSubFlags.Run:
+                SetBool("IsRun", active);
+                break;
+        }
     }
 
     public void CrossFadeAnimation(string animationName, float transitionDuration = 0.25f)
     {
         m_animator.CrossFade(animationName, transitionDuration);
     }
-    
+
+#if UNITY_EDITOR
+    public void LogAnimatorStates()
+    {
+        Debug.Log($"Animator States: Run = {m_animator.GetBool("IsRun")}, Crouch = {m_animator.GetBool("IsCrouch")}");
+    }
+#endif
 }
