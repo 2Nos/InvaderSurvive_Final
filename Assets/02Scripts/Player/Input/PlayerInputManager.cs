@@ -326,9 +326,6 @@ public class PlayerInputManager : MonoBehaviour
     {
         m_IsAim = isAim;
     }
-    private void Update()
-    {
-        //Debug.Log(m_IsMove_LocoM);
-    }
+
     #endregion ======================================== Android
 }

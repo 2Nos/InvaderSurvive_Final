@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using UnityEngine.Animations.Rigging;
+using Unity.Android.Gradle.Manifest;
 
 public class PlayerLocomotion
 {
@@ -13,12 +14,10 @@ public class PlayerLocomotion
     public LocomotionBaseState m_currentState;
     public LocomotionBaseState m_prevState;
     // Move 설정
-    public float m_currentVelocityY { get; private set; }
+    private float m_currentVelocityY = 0;
     private Vector2 m_currentAnimInput = Vector2.zero;
 
     public bool m_IsGrounded { get; private set; }
-    private float m_IgnoreGroundCheckTime = 0.3f; //일부 상태에서 땅 체크를 무시하기 위한 시간
-    private float m_GroundCheckTimer = 0f; // 타이머
 
     public bool m_IsProgress = false;
     //생성자 - PlayerCore에서 New로 생성
@@ -49,6 +48,8 @@ public class PlayerLocomotion
         { LocomotionSubFlags.Crouch, "IsCrouch" },
     };
 
+
+
     /// <summary>
     /// PlayerCore에서 Start에서 호출
     /// </summary>
@@ -58,10 +59,14 @@ public class PlayerLocomotion
         m_IsGrounded = true;
     }
 
+    public void FixedUpdate()
+    {
+        m_currentState?.FixedUpdate();
+    }
     public void Update()
     {
         m_currentState?.Update();
-        if (m_prevState == m_currentState.GetCheckTransition()) return;
+        Debug.Log(m_currentState);
         LocomotionBaseState newState = m_currentState.GetCheckTransition();
 
         ChangeState(newState);
@@ -69,7 +74,9 @@ public class PlayerLocomotion
 
     public void ChangeState(LocomotionBaseState newState)
     {
+        if(newState == null || newState == m_currentState) return; //null인 경우는 상태가 없다는 것, 즉 Idle상태로 돌아감
         //LocomotionBaseState에서 실질적으로Locomotion이 참조가되지 않음
+
         m_currentState?.Exit();
         m_currentState = newState;
         m_currentState?.Enter();
@@ -115,38 +122,87 @@ public class PlayerLocomotion
         m_PlayerCore.m_AnimationManager.UpdateMovementAnimation(m_currentAnimInput);
     }
 
-    public void UpdateVerticalMovement()
+    public void UpdateCheckInAir()
     {
         RaycastHit hit;
-        
-        if (m_GroundCheckTimer > 0)
+        if (Physics.Raycast(m_PlayerCore.m_Rigidbody.position, -m_PlayerCore.transform.up, out hit, 10f, m_PlayerCore.m_GroundMask))
+        {
+            if (hit.distance <= 0.1f)
+            {
+                m_IsGrounded = true;
+            }
+            else
+            {
+                m_IsGrounded = false;
+            }
+        }
+
+    }
+
+    //현재 함수 내용 InAir로 이동
+    //중력 사용하고 있으므로 일단은 주석처리
+    private float m_IgnoreGroundCheckTime = 1f;
+    private float m_GroundCheckTimer = 0f;
+    /// <summary>
+    /// 점프 및 중력 처리
+    /// </summary>
+    public void UpdateVerticalMovement()
+    {
+        // TODO : 위쪽 벽 충돌 처리
+
+        /*// 1. Ground Check 타이머 감소
+        if (m_GroundCheckTimer > 0f)
         {
             m_GroundCheckTimer -= Time.deltaTime;
         }
-        else if (m_GroundCheckTimer <= 0)
+        if (m_GroundCheckTimer <= 0f)
         {
-            if (Physics.Raycast(m_PlayerCore.transform.position, Vector3.down, out hit, 100f, m_PlayerCore.m_GroundMask))
+            RaycastHit hit;
+            if (Physics.Raycast(m_PlayerCore.m_Rigidbody.position, -m_PlayerCore.transform.up, out hit, 10f, m_PlayerCore.m_GroundMask))
             {
-                Debug.Log(hit.distance);
+
                 if (hit.distance <= 0.1f)
                 {
+                    if (m_IsGrounded) return;
                     m_currentVelocityY = 0f;
                     m_IsGrounded = true;
-                    Debug.Log("Grounded");
+
+                    // 바닥 뚫는 것 방지
+                    Vector3 fixedPos = m_PlayerCore.transform.position;
+                    fixedPos.y = hit.point.y + 0.05f;
+                    m_PlayerCore.m_Rigidbody.MovePosition(fixedPos);
+                    return;
                 }
                 else
                 {
-                    m_currentVelocityY -= 30f * Time.deltaTime; //중력값
                     m_IsGrounded = false;
                 }
             }
         }
-        Vector3 velocity = Vector3.up * m_currentVelocityY;
+        // 3. 중력 적용
+        if (!m_IsGrounded)
+        {
+            m_currentVelocityY += m_PlayerCore.m_Gravity * Time.deltaTime;
 
-        m_PlayerCore.m_Rigidbody.MovePosition(m_PlayerCore.m_Rigidbody.position + velocity * Time.deltaTime);
+            //TODO : 낙하 속도 제한
+            m_currentVelocityY = Mathf.Clamp(m_currentVelocityY, -m_PlayerCore.m_MaxFallingSpeed, m_PlayerCore.m_jumpForce);
+        }
+
+        // 4. 이동 적용
+        Vector3 velocity = new Vector3(0, m_currentVelocityY, 0);
+        m_PlayerCore.m_Rigidbody.MovePosition(m_PlayerCore.transform.position + velocity * Time.deltaTime);*/
     }
 
-    // 회전 처리
+    /// <summary>
+    /// Jump키 눌렸을 때 LocomotionBase의 CheckLocomotion에서 호출;
+    /// </summary>
+    public void ExecuteJump()
+    {
+        m_PlayerCore.m_Rigidbody.AddForce(m_PlayerCore.transform.up * m_PlayerCore.m_jumpForce, ForceMode.Impulse); //점프 힘을 주기 위해 Rigidbody에 힘을 줌
+        //m_currentVelocityY = m_PlayerCore.m_jumpForce;
+        //m_GroundCheckTimer = m_IgnoreGroundCheckTime; // 점프 직후 바닥 체크 무시!
+    }
+
     public void HandleRotation()
     {
         // 화면 회전 중지 시
@@ -195,17 +251,6 @@ public class PlayerLocomotion
     }
     #endregion ======================================== /Move & Rotation
 
-    /// <summary>
-    /// UpdateVerticalMovement()전에 먼저 호출하여 점프
-    /// </summary>
-    public void ExecuteJumpFromEnter()
-    {
-        m_currentVelocityY = 0f;
-        m_PlayerCore.m_Rigidbody.AddForce(Vector3.up * m_PlayerCore.m_jumpForce, ForceMode.Impulse);
-        m_IsGrounded = false;
-        m_GroundCheckTimer = m_IgnoreGroundCheckTime;
-    }
-
     //Locomotion의 SubFlags 애니메이션 관리
     public void UpdateLocomotionFlagAnimation()
     {
@@ -219,13 +264,36 @@ public class PlayerLocomotion
     //Locomotion의 MainState 애니메이션 관리 - LocomotionBaseState에서 호출
     public void UpdateLocomotionMainStateAnimation(LocomotionMainState locomotionMainState, bool isPlay)
     {
+        //TODO : 애니메이션 세팅을 위한 Enum을 따로 만들어서 관리
+        /*switch (setType)
+                {
+                    case SetType.SetBool:
+                        m_PlayerCore.m_AnimationManager.SetBool(m_locomotionMainAniMap[locomotionMainState], isPlay);
+                        break;
+                    case SetType.SetTrigger:
+                        m_PlayerCore.m_AnimationManager.SetTrigger(m_locomotionMainAniMap[locomotionMainState]);
+                        break;
+                    case SetType.SetFloat:
+                        break;
+                    default:
+                        break;
+                }*/
         if (m_locomotionMainAniMap.ContainsKey(locomotionMainState))
         {
             m_PlayerCore.m_AnimationManager.SetBool(m_locomotionMainAniMap[locomotionMainState], isPlay);
+
+            //SetTrigger도 동작
+            if (locomotionMainState == LocomotionMainState.InAir)
+            {
+                if (!isPlay) return;
+                m_PlayerCore.m_AnimationManager.SetTrigger("IsJump");
+            }
         }
         else
         {
             Debug.LogError("애니메이션이 존재하지 않습니다.");
         }
+
+        
     }
 }

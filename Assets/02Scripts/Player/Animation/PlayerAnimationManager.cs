@@ -1,5 +1,13 @@
 using UnityEngine;
 
+
+public enum SetType
+{
+    SetBool,
+    SetTrigger,
+    SetFloat
+}
+
 [RequireComponent(typeof(Animator))]
 public class PlayerAnimationManager : MonoBehaviour
 {
@@ -42,11 +50,4 @@ public class PlayerAnimationManager : MonoBehaviour
     {
         m_animator.CrossFade(animationName, transitionDuration);
     }
-
-#if UNITY_EDITOR
-    public void LogAnimatorStates()
-    {
-        Debug.Log($"Animator States: Run = {m_animator.GetBool("IsRun")}, Crouch = {m_animator.GetBool("IsCrouch")}");
-    }
-#endif
 }

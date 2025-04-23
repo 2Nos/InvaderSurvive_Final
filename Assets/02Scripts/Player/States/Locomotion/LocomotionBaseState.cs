@@ -18,7 +18,8 @@ public abstract class LocomotionBaseState
     public abstract LocomotionMainState DetermineStateType(); 
     protected LocomotionMainState? prevLocomotionMainState = null;
 
-    public LocomotionBaseState GetCheckTransition() => TransitionLocomotion();
+    private LocomotionBaseState m_changeMainState = null;
+    public LocomotionBaseState GetCheckTransition() => m_changeMainState;
 
     public virtual void Enter()
     {
@@ -30,7 +31,7 @@ public abstract class LocomotionBaseState
 
     public virtual void FixedUpdate()
     {
-        // 고정 업데이트는 물리 연산에 사용되므로, 물리 연산이 필요한 경우에만 사용
+        //VerticalMovement();
     }
 
     /// <summary>
@@ -39,6 +40,8 @@ public abstract class LocomotionBaseState
     /// </summary>
     public virtual void Update()
     {
+        m_changeMainState = TransitionLocomotion();
+        m_PlayerLocomotion.UpdateCheckInAir();
         Movement();
     }
 
@@ -51,9 +54,13 @@ public abstract class LocomotionBaseState
 
     protected virtual void Movement()
     {
-        m_PlayerLocomotion.UpdateVerticalMovement();
         m_PlayerLocomotion.HandleRotation();
         m_PlayerLocomotion.HandleMove();
+    }
+    protected virtual void VerticalMovement()
+    {
+        //m_PlayerLocomotion.UpdateGravityMovement();
+
     }
 
     /// <summary>
@@ -85,11 +92,17 @@ public abstract class LocomotionBaseState
     /// </summary>
     protected void CheckLocomotion()
     {
-        if(m_PlayerLocomotion.m_IsProgress) return;
+        //m_IsProgress가 true인 경우에는 상태 전환을 하지 않음
+        if (m_PlayerLocomotion.m_IsProgress) return;
 
-        if (m_PlayerCore.m_InputManager.m_IsInAir_LocoM)
+        if (!m_PlayerLocomotion.m_IsGrounded) //절벽 떨어지는 상황 고려
         {
-            SetMainState(LocomotionMainState.InAir);
+            SetMainState(LocomotionMainState.InAir); //LasndState 같이 처리
+        }
+        else if (m_PlayerCore.m_InputManager.m_IsInAir_LocoM)
+        {
+            m_PlayerLocomotion.ExecuteJump();
+            SetMainState(LocomotionMainState.InAir); //LasndState 같이 처리
         }
         else if (m_PlayerCore.m_InputManager.m_IsClimb_LocoM)
         {
@@ -107,6 +120,7 @@ public abstract class LocomotionBaseState
         {
             SetMainState(LocomotionMainState.Idle);
         }
+        Debug.Log($"CheckLocomotion");
         m_PlayerLocomotion.UpdateLocomotionFlagAnimation();
     }
 
@@ -129,7 +143,7 @@ public abstract class LocomotionBaseState
         var current = m_PlayerCore.m_StateFlagManager.m_LocomotionMain;
         if (current == prevLocomotionMainState) return m_PlayerLocomotion.m_currentState;
         
-        Debug.Log($"State Transition: {prevLocomotionMainState} -> {current}");
+        Debug.Log($"State Transition: {current}");
         return Create(current);
     }
 

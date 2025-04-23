@@ -21,9 +21,9 @@ public class IdleState : LocomotionBaseState
         base.Exit();
     }
 
+    // Idle일때는 회전만
     protected override void Movement()
     {
-        m_PlayerLocomotion.UpdateVerticalMovement();
         m_PlayerLocomotion.HandleRotation();
     }
 }

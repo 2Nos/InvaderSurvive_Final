@@ -33,9 +33,14 @@ public class PlayerCore : MonoBehaviour
     [Range(1, 10)] public float m_crouchSpeed = 3f;
     [Range(1, 10)] public float m_crouchRunSpeed = 9f;
     [Range(20, 50)] public float m_sprintSpeed = 20f;
-    [Range(1, 10)] public float m_jumpForce = 5f;
+    [Range(1, 100)] public float m_jumpForce = 5f;
 
-    [Header("[ Player Rot ]")]
+
+    [Range(-10, 0.1f)] public float m_Gravity = -9.8f;
+
+    [Tooltip("낙하 속도"),Range(5, 30)] public float m_MaxFallingSpeed = 30;
+
+        [Header("[ Player Rot ]")]
     [Range(1, 20)] public float m_rotationSpeed;
     [Range(1, 50)]public float m_rotationAimSpeed; //에임 상태에서의 회전 속도
     [Range(1, 60)] public float m_rotationDamping; //회전 감속
@@ -58,13 +63,20 @@ public class PlayerCore : MonoBehaviour
 
         m_Locomotion = new PlayerLocomotion(this);
         m_Combat = new PlayerCombat(this);
+
+        m_Rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
     }
     private void Start()
     {
         m_Locomotion.InitState();
-        m_Rigidbody.transform.position = Vector3.zero;
+        //m_Rigidbody.transform.position = Vector3.zero;
     }
 
+    public void FixedUpdate()
+    {
+        m_Locomotion?.FixedUpdate();
+        //m_Combat?.FixedUpdate();
+    }
     private void Update()
     {
         m_Locomotion?.Update();
