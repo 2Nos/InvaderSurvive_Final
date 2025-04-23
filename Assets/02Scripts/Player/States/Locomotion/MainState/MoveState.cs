@@ -2,10 +2,23 @@ using UnityEngine;
 
 public class MoveState : LocomotionBaseState
 {
-    public MoveState(PlayerCore playerCore) : base(playerCore){}
+    public MoveState(PlayerLocomotion playerLocomotion) : base(playerLocomotion){}
 
-    protected override LocomotionMainState GetMainState() => LocomotionMainState.Moving;
-    
+    public override LocomotionMainState DetermineStateType() => LocomotionMainState.Move;
+    public override void Enter()
+    {
+        base.Enter();
+    }
 
-    protected override string SetAnimationBoolName() => AniKeys.Move;
+    public override void Update()
+    {
+        base.Update();
+
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+    }
+
 }

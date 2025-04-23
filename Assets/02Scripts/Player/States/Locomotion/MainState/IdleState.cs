@@ -1,13 +1,11 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class IdleState : LocomotionBaseState
 {
-    public IdleState(PlayerCore playerCore) : base(playerCore){}
+    public IdleState(PlayerLocomotion playerLocomotion) : base(playerLocomotion){}
 
-    //현재 상태 정의
-    protected override LocomotionMainState GetMainState() => LocomotionMainState.Idle;
-    //현재 애니메이션
-    protected override string SetAnimationBoolName() => AniKeys.Idle;
+    public override LocomotionMainState DetermineStateType() => LocomotionMainState.Idle; //현재 상태
 
     public override void Enter()
     {
@@ -17,12 +15,15 @@ public class IdleState : LocomotionBaseState
     public override void Update()
     {
         base.Update();
-
-
     }
-
     public override void Exit()
     {
         base.Exit();
+    }
+
+    // Idle일때는 회전만
+    protected override void Movement()
+    {
+        m_PlayerLocomotion.HandleRotation();
     }
 }
