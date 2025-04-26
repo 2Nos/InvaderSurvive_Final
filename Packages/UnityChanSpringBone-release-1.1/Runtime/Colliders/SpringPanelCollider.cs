@@ -18,9 +18,9 @@ namespace Unity.Animations.SpringBones
 
         public SpringBone.CollisionStatus CheckForCollisionAndReact
         (
-            Vector3 headPosition, 
-            float length, 
-            ref Vector3 tailPosition, 
+            Vector3 headPosition,
+            float length,
+            ref Vector3 tailPosition,
             float tailRadius,
             ref Vector3 hitNormal
         )
@@ -111,7 +111,7 @@ namespace Unity.Animations.SpringBones
         {
             X = 0,
             Y,
-            Z, 
+            Z,
             AxisCount
         }
 
@@ -179,9 +179,9 @@ namespace Unity.Animations.SpringBones
             var halfWidth = 0.5f * width;
             var halfHeight = 0.5f * height;
             localGizmoPoints[0] = new Vector3(-halfWidth, -halfHeight, 0f);
-            localGizmoPoints[1] = new Vector3( halfWidth, -halfHeight, 0f);
-            localGizmoPoints[2] = new Vector3( halfWidth,  halfHeight, 0f);
-            localGizmoPoints[3] = new Vector3(-halfWidth,  halfHeight, 0f);
+            localGizmoPoints[1] = new Vector3(halfWidth, -halfHeight, 0f);
+            localGizmoPoints[2] = new Vector3(halfWidth, halfHeight, 0f);
+            localGizmoPoints[3] = new Vector3(-halfWidth, halfHeight, 0f);
 
             for (int pointIndex = 0; pointIndex < PointCount; pointIndex++)
             {
@@ -228,8 +228,8 @@ namespace Unity.Animations.SpringBones
 
         private void RecordCollision
         (
-            Vector3 tailPosition, 
-            float tailRadius, 
+            Vector3 tailPosition,
+            float tailRadius,
             SpringBone.CollisionStatus collisionStatus
         )
         {

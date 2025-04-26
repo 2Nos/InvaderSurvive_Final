@@ -38,5 +38,5 @@ namespace Unity.Animations.SpringBones
                 ReparentSelectedObjects();
             }
         }
-   }
+    }
 }

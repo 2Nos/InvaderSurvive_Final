@@ -16,8 +16,8 @@ namespace Unity.Animations.SpringBones
         (
             GameObject springBoneRoot,
             GameObject colliderRoot,
-            string path, 
-            IEnumerable<DynamicsSetup.ParseMessage> errors, 
+            string path,
+            IEnumerable<DynamicsSetup.ParseMessage> errors,
             IConfirmAction onConfirm
         )
         {

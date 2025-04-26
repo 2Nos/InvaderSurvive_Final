@@ -1,7 +1,7 @@
-﻿using Unity.Animations.SpringBones.GameObjectExtensions;
-using Unity.Animations.SpringBones.StringQueueExtensions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Unity.Animations.SpringBones.GameObjectExtensions;
+using Unity.Animations.SpringBones.StringQueueExtensions;
 using UnityEngine;
 
 namespace Unity.Animations.SpringBones
@@ -153,7 +153,7 @@ namespace Unity.Animations.SpringBones
                 springBoneRecords = boneRecordsToUse;
             }
         }
- 
+
         // private
 
         // todo: Add to CSV
@@ -554,5 +554,5 @@ namespace Unity.Animations.SpringBones
 
             return true;
         }
-   }
+    }
 }

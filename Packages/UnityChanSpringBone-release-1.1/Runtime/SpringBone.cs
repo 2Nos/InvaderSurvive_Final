@@ -62,7 +62,7 @@ namespace Unity.Animations.SpringBones
 
             InitializeSpringLengthAndTipPosition();
         }
-        
+
         public Vector3 ComputeChildPosition()
         {
             var children = GetValidChildren(transform);
@@ -108,10 +108,10 @@ namespace Unity.Animations.SpringBones
         public void UpdateSpring(float deltaTime, Vector3 externalForce)
         {
             skinAnimationLocalRotation = transform.localRotation;
-    
+
             var baseWorldRotation = transform.parent.rotation * initialLocalRotation;
             var orientedInitialPosition = transform.position + baseWorldRotation * boneAxis * springLength;
-            
+
             // Hooke's law: force to push us to equilibrium
             var force = stiffnessForce * (orientedInitialPosition - currTipPos);
             force += springForce + externalForce;

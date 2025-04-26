@@ -1,6 +1,6 @@
-﻿using Unity.Animations.SpringBones.GameObjectExtensions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Unity.Animations.SpringBones.GameObjectExtensions;
 using UnityEditor;
 using UnityEngine;
 
@@ -89,7 +89,7 @@ namespace Unity.Animations.SpringBones
 
         public static SpringManager PerformSetup
         (
-            GameObject rootObject, 
+            GameObject rootObject,
             IEnumerable<GameObject> newSpringBones,
             AutoSetupParameters parameters
         )
@@ -148,7 +148,7 @@ namespace Unity.Animations.SpringBones
         }
 
         // private
-        
+
         private static bool IsProbablyFacialObject(Transform transform)
         {
             string[] boneNameTokensToFind = { "head", "neck" };
@@ -178,7 +178,7 @@ namespace Unity.Animations.SpringBones
                 var modelDirectory = System.IO.Path.GetDirectoryName(meshPaths.First());
                 return PathUtil.AssetPathToSystemPath(modelDirectory);
             }
-            
+
             // Find a texture and go up from there
             var renderers = rootObject.GetComponentsInChildren<Renderer>(true)
                 .Where(renderer => !IsProbablyFacialObject(renderer.transform));

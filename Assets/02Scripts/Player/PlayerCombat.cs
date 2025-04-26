@@ -6,7 +6,7 @@ public class PlayerCombat
     public PlayerCombat(PlayerCore core)
     {
         this.m_core = core;
-        //ChangeState(new NoCombatState(this));
+        //SwithcCurrentState(new NoCombatState(this));
     }
 
     public void Update()

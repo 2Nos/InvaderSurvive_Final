@@ -1,5 +1,5 @@
-﻿using Unity.Animations.SpringBones.GameObjectExtensions;
-using System.Linq;
+﻿using System.Linq;
+using Unity.Animations.SpringBones.GameObjectExtensions;
 using UnityEditor;
 using UnityEngine;
 

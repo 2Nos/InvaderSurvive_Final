@@ -7,68 +7,97 @@
 
 // ========================================
 using UnityEngine;
+using System.Collections.Generic;
 using DUS.Joystick;
+
 [RequireComponent(typeof(CapsuleCollider))]
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(MainStateAndSubFlagsManager))]
 [RequireComponent(typeof(PlayerInputManager))] // InputManager컴포넌트를 종속성으로 PlayerCore있는 곳에 자동으로 추가
+
 public class PlayerCore : MonoBehaviour
 {
     #region ======================================== Module
+    /*private static PlayerCore instance;
+    public static PlayerCore Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = FindObjectOfType<PlayerCore>();
+                if (instance == null)
+                {
+                    Debug.LogError("PlayerCore instance not found in the scene.");
+                }
+            }
+            return instance;
+        }
+    }*/
     public PlayerInputManager m_InputManager { get; private set; }
     public MainStateAndSubFlagsManager m_StateFlagManager { get; private set; }
     public PlayerAnimationManager m_AnimationManager { get; private set; }
     public CameraRigManager m_CameraManager { get; private set; }
     public PlayerLocomotion m_Locomotion { get; private set; }
     public PlayerCombat m_Combat { get; private set; }
-    public LayerMask m_GroundMask;
-
-
     #endregion ======================================== /Module
 
-    #region ======================================== Player Value
-    [Header("[ Player Move ]")]
-    [Range(1, 10)] public float m_moveSpeed = 5f;
+    #region ======================================== Player Value - Locomotion
+    [Header("[ PlayerCore Move ]")]
+    //SetCurrentSpeed
+    [Range(1, 10)] public float m_walkSpeed = 5f;
     [Range(1, 20)] public float m_runSpeed = 15f;
     [Range(1, 10)] public float m_crouchSpeed = 3f;
     [Range(1, 10)] public float m_crouchRunSpeed = 9f;
     [Range(20, 50)] public float m_sprintSpeed = 20f;
-    [Range(1, 100)] public float m_jumpForce = 5f;
-
-
+    [Range(1, 10)] public float m_DodgeSpeed = 5f;
+    [Range(1, 10)] public float m_SlideSpeed = 5f;
+    [Range(1, 10)] public float m_ClimbSpeed = 5f;
+    [Range(1, 10)] public float m_WallRunSpeed = 5f;
+    [Range(1, 10)] public float m_jumpSpeed = 5f;
+    [Range(1, 100)] public float m_jumpUpForce = 5f;
     [Range(-10, 0.1f)] public float m_Gravity = -9.8f;
+    public float m_CurrentSpeed { get; private set; } //현재 속도
 
-    [Tooltip("낙하 속도"),Range(5, 30)] public float m_MaxFallingSpeed = 30;
+    [Range(1, 50)] public float m_MaxVelocityY = 30;
+    [Range(-50, -1)] public float m_MinVelocityY = -30;
 
-        [Header("[ Player Rot ]")]
-    [Range(1, 20)] public float m_rotationSpeed;
-    [Range(1, 50)]public float m_rotationAimSpeed; //에임 상태에서의 회전 속도
+    [Header("[ PlayerCore Rot ]")]
+    [Range(1, 20)] public float m_rotationSpeed = 10;
     [Range(1, 60)] public float m_rotationDamping; //회전 감속
-    #endregion ======================================== /Player Value
+    #endregion ======================================== /Player Value Locomotion
 
+    [Range(1, 50)] public float m_rotationAimSpeed; //에임 상태에서의 회전 속도
+    public LayerMask m_GroundMask;
     public Rigidbody m_Rigidbody { get; private set; }
-    public CapsuleCollider m_CapsuleCollider{  get; private set; }
+    public CapsuleCollider[] m_CapsuleCollider { get; private set; }
+    public float m_CurrentRotSpeed { get; private set; }
 
     //받아오는 순서가 중요
     private void Awake()
     {
+        //instance = this;
         //m_Locomotion 생성자 전에 먼저 Get으로 모듈을 찾아놓고 있어야함
         m_InputManager = GetComponent<PlayerInputManager>(); // 또는 직접 주입
         m_AnimationManager = GetComponentInChildren<PlayerAnimationManager>();
         m_Rigidbody = GetComponent<Rigidbody>();
-        m_CapsuleCollider = GetComponent<CapsuleCollider>();
+        m_CapsuleCollider = GetComponents<CapsuleCollider>();
         m_CameraManager = FindObjectOfType<CameraRigManager>();
 
         m_StateFlagManager = GetComponent<MainStateAndSubFlagsManager>();
 
+        //생성자 this를 넣지 않는 이유는 생명주기에 의한 내부 코드 복잡도 발생있기에 Initialize로 다음에 처리
         m_Locomotion = new PlayerLocomotion(this);
-        m_Combat = new PlayerCombat(this);
+        //m_Combat = new PlayerCombat(this);
 
         m_Rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
     }
     private void Start()
     {
-        m_Locomotion.InitState();
+        OnChangeColider(true);
+        m_Locomotion.InitializeLocomotion();
+        m_CurrentSpeed = m_walkSpeed;
+        m_CurrentRotSpeed = m_rotationSpeed;
         //m_Rigidbody.transform.position = Vector3.zero;
     }
 
@@ -82,4 +111,33 @@ public class PlayerCore : MonoBehaviour
         m_Locomotion?.Update();
         m_Combat?.Update();
     }
+
+
+    #region ======================================== Set Player Value - Locomotion
+    public void SetCurrentMoveSpeed(float speed)
+    {
+        m_CurrentSpeed = speed;
+    }
+    public void SetCurrentRotSpeed(float speed)
+    {
+        m_CurrentRotSpeed = speed;
+    }
+
+    public void SetRigidVelocity(Vector3 velocity)
+    {
+        m_Rigidbody.linearVelocity = velocity;
+    }
+    public void OnChangeColider(bool isOrigin)
+    {
+        m_CapsuleCollider[0].enabled = isOrigin;
+        m_CapsuleCollider[1].enabled = !isOrigin; //슬라이드 할 때의 영역
+    }
+
+    public void SetRigidVelocityY(float velocityY)
+    {
+        Vector3 velocity = m_Rigidbody.linearVelocity;
+        velocity.y = velocityY;
+        m_Rigidbody.linearVelocity = velocity;
+    }
+    #endregion ======================================== /Set Player Value - Locomotion
 }

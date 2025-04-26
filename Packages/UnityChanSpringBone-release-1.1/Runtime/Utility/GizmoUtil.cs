@@ -27,9 +27,9 @@ namespace Unity.Animations.SpringBones
 
         public static void DrawTransform
         (
-            Vector3 origin, 
-            Transform orientation, 
-            float drawScale, 
+            Vector3 origin,
+            Transform orientation,
+            float drawScale,
             float headRatio = 0.05f
         )
         {

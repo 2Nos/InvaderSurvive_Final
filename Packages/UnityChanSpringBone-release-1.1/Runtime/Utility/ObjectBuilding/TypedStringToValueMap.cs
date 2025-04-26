@@ -9,7 +9,7 @@ namespace Unity.Animations.SpringBones
         public TypedStringToValueMap
         (
             System.Type inputType,
-            Dictionary<string, System.Object> inputMap, 
+            Dictionary<string, System.Object> inputMap,
             System.Object inputDefaultValue
         )
         {

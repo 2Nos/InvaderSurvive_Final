@@ -198,9 +198,9 @@ namespace Unity.Animations.SpringBones
         {
             public Column
             (
-                IEnumerable<IElement> children, 
-                bool showBackground = true, 
-                float padding = 4f, 
+                IEnumerable<IElement> children,
+                bool showBackground = true,
+                float padding = 4f,
                 float rowSpacing = Spacing
             )
             {
@@ -218,7 +218,7 @@ namespace Unity.Animations.SpringBones
             {
                 get
                 {
-                    return Elements.Sum(item => item.Height) 
+                    return Elements.Sum(item => item.Height)
                         + RowSpacing * (Elements.Length - 1)
                         + Padding * 2f;
                 }
