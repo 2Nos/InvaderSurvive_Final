@@ -1,10 +1,12 @@
 using UnityEngine;
 
 
-public enum SetType
+public enum AniParmType
 {
+    None = 0,
     SetBool,
     SetTrigger,
+    SetInt,
     SetFloat
 }
 
@@ -12,42 +14,45 @@ public enum SetType
 public class PlayerAnimationManager : MonoBehaviour
 {
     //Awake가 Locomotion보다 느려서 GetComponent 대신 직접 넣기(순서 바꾸는 방법은 있으나 일단 이렇게)
-    [SerializeField] Animator m_animator;
+    public Animator m_Animator { get; private set; }
 
     private readonly int m_moveSpeedHashX = Animator.StringToHash("MoveDirectionX");
     private readonly int m_moveSpeedHashY = Animator.StringToHash("MoveDirectionY");
-    public void SetBool(string name, bool value) => m_animator.SetBool(name, value);
-    public void SetTrigger(string name) => m_animator.SetTrigger(name);
-    public void SetFloat(string name, float value) => m_animator.SetFloat(name, value);
+    public void SetParmBool(string name, bool value) => m_Animator.SetBool(name, value);
+    public void SetParmTrigger(string name) => m_Animator.SetTrigger(name);
+    public void SetParmFloat(string name, float value) => m_Animator.SetFloat(name, value);
+    public void SetParmInt(string name, int value) => m_Animator.SetInteger(name, value);
 
     private void Awake()
     {
-        if (m_animator == null)
+        if (m_Animator == null)
         {
-            Debug.LogError("Animator not assigned in PlayerAnimationManager.");
+            m_Animator = GetComponent<Animator>();
         }
+        
     }
     public void UpdateMovementAnimation(Vector2 inputMovement)
     {
-        m_animator.SetFloat(m_moveSpeedHashX, inputMovement.x);
-        m_animator.SetFloat(m_moveSpeedHashY, inputMovement.y);
+        m_Animator.SetFloat(m_moveSpeedHashX, inputMovement.x);
+        m_Animator.SetFloat(m_moveSpeedHashY, inputMovement.y);
     }
 
-    public void UpdateFlagAnimation(LocomotionSubFlags flag, bool active)
-    {
-        switch (flag)
-        {
-            case LocomotionSubFlags.Crouch:
-                SetBool("IsCrouch", active);
-                break;
-            case LocomotionSubFlags.Run:
-                SetBool("IsRun", active);
-                break;
-        }
-    }
+    /* public void UpdateFlagAnimation(LocomotionSubFlags flag, bool active)
+     {
+         switch (flag)
+         {
+             case LocomotionSubFlags.Crouch:
+                 SetParmBool("IsCrouch", active);
+                 break;
+             case LocomotionSubFlags.Run:
+                 SetParmBool("IsRun", active);
+                 break;
+         }
+     }*/
 
     public void CrossFadeAnimation(string animationName, float transitionDuration = 0.25f)
     {
-        m_animator.CrossFade(animationName, transitionDuration);
+        m_Animator.CrossFade(animationName, transitionDuration);
     }
+
 }

@@ -1,6 +1,6 @@
-using Unity.Animations.SpringBones.StringQueueExtensions;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Animations.SpringBones.StringQueueExtensions;
 using UnityEngine;
 
 namespace Unity.Animations.SpringBones
@@ -197,7 +197,7 @@ namespace Unity.Animations.SpringBones
         {
             return SerializeObjectFromStrings(typeof(T), sourceItems, firstOptionalField, ref error) as T;
         }
-        
+
         // private
 
         private const int UnknownVersion = -1;

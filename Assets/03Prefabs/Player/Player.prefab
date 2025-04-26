@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 863054049424976126}
   - component: {fileID: 4091663867723378643}
   - component: {fileID: 3867457106370666028}
+  - component: {fileID: 9165202643484011232}
   - component: {fileID: 2154995255573081565}
   - component: {fileID: 534232698860191472}
   - component: {fileID: 9216265200596922746}
@@ -201,14 +202,37 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.3
+  m_Radius: 0.25
   m_Height: 1.6
   m_Direction: 1
   m_Center: {x: 0, y: 0.8, z: 0}
+--- !u!136 &9165202643484011232
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2988302996139032279}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.25
+  m_Height: 1.6
+  m_Direction: 2
+  m_Center: {x: 0, y: 0.3, z: 0}
 --- !u!114 &2154995255573081565
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -233,18 +257,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 539ec5c01e9fa1f46a6aeb3d713eb5ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_walkSpeed: 3
+  m_runSpeed: 7
+  m_crouchSpeed: 2
+  m_crouchRunSpeed: 4
+  m_sprintSpeed: 20
+  m_DodgeSpeed: 5
+  m_SlideSpeed: 8
+  m_ClimbSpeed: 5
+  m_WallRunSpeed: 5
+  m_jumpSpeed: 5
+  m_jumpUpForce: 5
+  m_Gravity: -9.8
+  m_MaxVelocityY: 30
+  m_MinVelocityY: -30
+  m_rotationSpeed: 10
+  m_rotationDamping: 20
+  m_rotationAimSpeed: 5
   m_GroundMask:
     serializedVersion: 2
     m_Bits: 128
-  m_moveSpeed: 5
-  m_runSpeed: 15
-  m_crouchSpeed: 3
-  m_crouchRunSpeed: 9
-  m_sprintSpeed: 20
-  m_jumpForce: 2
-  m_rotationSpeed: 10
-  m_rotationAimSpeed: 5
-  m_rotationDamping: 20
 --- !u!114 &9216265200596922746
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -613,6 +645,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2707504972485253770}
     m_Modifications:
+    - target: {fileID: 277091493858213732, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
+      propertyPath: shouldDrawGizmosThisFrame
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 864136147894431245, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
+      propertyPath: shouldDrawGizmosThisFrame
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1188422492633836276, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
+      propertyPath: shouldDrawGizmosThisFrame
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1300892900724282606, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -653,6 +697,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1737981691368104205, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
+      propertyPath: shouldDrawGizmosThisFrame
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2278658768488185832, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
+      propertyPath: shouldDrawGizmosThisFrame
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3397181089994674900, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
+      propertyPath: shouldDrawGizmosThisFrame
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3409439322915905163, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
+      propertyPath: m_TranslationOffsets.Array.data[0].z
+      value: 0.098937966
+      objectReference: {fileID: 0}
+    - target: {fileID: 3764217357301703552, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
+      propertyPath: shouldDrawGizmosThisFrame
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4337146073327742218, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
       propertyPath: m_Controller
       value: 
@@ -661,9 +725,53 @@ PrefabInstance:
       propertyPath: m_ApplyRootMotion
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4480544428916145846, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
+      propertyPath: shouldDrawGizmosThisFrame
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5419562957233112993, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
+      propertyPath: shouldDrawGizmosThisFrame
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5685764798219348711, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
+      propertyPath: shouldDrawGizmosThisFrame
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6433060413549724966, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
+      propertyPath: shouldDrawGizmosThisFrame
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6743104406884526140, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
+      propertyPath: shouldDrawGizmosThisFrame
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6813289711026322957, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
+      propertyPath: m_TranslationOffsets.Array.data[0].z
+      value: 0.098937966
+      objectReference: {fileID: 0}
     - target: {fileID: 7451115767214165031, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
       propertyPath: m_Name
       value: UnityChanSSU
+      objectReference: {fileID: 0}
+    - target: {fileID: 7547178683276811956, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
+      propertyPath: shouldDrawGizmosThisFrame
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7819583689689434325, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
+      propertyPath: shouldDrawGizmosThisFrame
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8422559761149824577, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
+      propertyPath: shouldDrawGizmosThisFrame
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8456343981729274265, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
+      propertyPath: shouldDrawGizmosThisFrame
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8946495900225468362, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
+      propertyPath: shouldDrawGizmosThisFrame
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -955,7 +1063,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a997d28328711fb4db4388d9c149ef61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_animator: {fileID: 8192519858268171892}
 --- !u!114 &8002421975694031739
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1667,11 +1774,6 @@ Transform:
 --- !u!4 &8150612914090447427 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4367864343926460733, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
-  m_PrefabInstance: {fileID: 5584760648220689278}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &8192519858268171892 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 4337146073327742218, guid: 9a3ab5779ed0cf84d984215fb176264f, type: 3}
   m_PrefabInstance: {fileID: 5584760648220689278}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &8225884341164412029 stripped

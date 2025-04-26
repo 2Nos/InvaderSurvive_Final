@@ -4,9 +4,6 @@
 // ========================================
 using UnityEngine;
 using UnityEngine.InputSystem;
-using DUS.Joystick;
-using UnityEditor.XR;
-using Unity.VisualScripting;
 
 public enum InputType
 {
@@ -25,12 +22,12 @@ public class PlayerInputManager : MonoBehaviour
 
     public bool m_IsMove_LocoM => m_MovementInput.sqrMagnitude > 0.01f;
     public Vector2 m_LookInput_LocoM { get; private set; }          //Mouse_Rot(DeltaValue)
-    public bool m_IsInAir_LocoM { get; private set; }               //Space bar
+    public bool m_IsJump_LocoM { get; private set; }               //Space bar
     public bool m_IsClimb_LocoM { get; private set; }               //벽에서 F
     public bool m_IsSlide_LocoM { get; private set; }               //달리다가 Left SHift + Space bar
     public bool m_IsWallRun_LocoM { get; private set; }             //벽에서 Shift + Space bar
     public bool m_IsDodging_LocoA { get; private set; }             // C
-    
+
 
     public bool m_IsRun_LocoF { get; private set; }               //Left Shift
     public bool m_IsCrouch_LocoF { get; private set; }            // Left Ctrl
@@ -42,7 +39,7 @@ public class PlayerInputManager : MonoBehaviour
     public bool m_IsReloading { get; private set; }         //R
     public bool m_IsInteraction { get; private set; }       //F 대부분의 상호작용
     public bool m_IsChangeLeftView { get; private set; }    //Tap 에임 좌우 반전
-    public bool m_IsStopCameraRot { get; private set; }     //V 카메라 회전 중지
+    public bool m_IsStopBodyRot { get; private set; }     //V 카메라 중심의 몸회전 중지(카메라는 회전)
 
     // InputSystem_Actions 클래스의 인스턴스
     private PlayerInputAC m_inputActions;
@@ -74,7 +71,6 @@ public class PlayerInputManager : MonoBehaviour
         m_inputActions.Player.Aim.canceled += OnAim;
 
         m_inputActions.Player.Run.performed += OnRun;
-        m_inputActions.Player.Run.canceled += OnRun;
 
         m_inputActions.Player.Crouch.performed += OnCrouch;
 
@@ -117,7 +113,6 @@ public class PlayerInputManager : MonoBehaviour
         m_inputActions.Player.Aim.canceled -= OnAim;
 
         m_inputActions.Player.Run.performed -= OnRun;
-        m_inputActions.Player.Run.canceled -= OnRun;
 
         m_inputActions.Player.Crouch.performed -= OnCrouch;
 
@@ -160,35 +155,42 @@ public class PlayerInputManager : MonoBehaviour
 
     private void OnRun(InputAction.CallbackContext context)
     {
-        m_IsRun_LocoF = context.ReadValueAsButton();
-
-        if(m_IsRun_LocoF)
-        {
-            m_StateFlagManager.SetLocomotionFlag(LocomotionSubFlags.Run);
-        }
-        else
-        {
-            m_StateFlagManager.ClearLocomotionFlag(LocomotionSubFlags.Run);
-        }
+        m_IsRun_LocoF = !m_IsRun_LocoF;
     }
-
+    public void SetFlagKey(bool isRun, bool isCrouch, bool isStopBodyRot = false)
+    {
+        m_IsRun_LocoF = isRun;
+        m_IsCrouch_LocoF = isCrouch;
+        m_IsStopBodyRot = isStopBodyRot;
+    }
+    /*public void OnSlideEnter()
+    {
+        m_IsStopBodyRot = true;
+    }
+    //슬라이드가 끝이나면 누른키들은 전부 해제
+    public void OnSlideEnd()
+    {
+        m_IsRun_LocoF = false;
+        m_IsCrouch_LocoF = false;
+        m_IsStopBodyRot = false;
+    }*/
     private void OnCrouch(InputAction.CallbackContext context)
     {
         m_IsCrouch_LocoF = !m_IsCrouch_LocoF;
 
-        if (m_IsCrouch_LocoF)
+        /*if (m_IsCrouch_LocoF)
         {
             m_StateFlagManager.SetLocomotionFlag(LocomotionSubFlags.Crouch);
         }
         else
         {
             m_StateFlagManager.ClearLocomotionFlag(LocomotionSubFlags.Crouch);
-        }
+        }*/
     }
 
     private void OnJump(InputAction.CallbackContext context)
     {
-        m_IsInAir_LocoM = context.ReadValueAsButton();
+        m_IsJump_LocoM = context.ReadValueAsButton();
     }
 
     private void OnAttack(InputAction.CallbackContext context)
@@ -213,7 +215,7 @@ public class PlayerInputManager : MonoBehaviour
 
     private void OnStopCameraRot(InputAction.CallbackContext context)
     {
-        m_IsStopCameraRot = context.ReadValueAsButton();
+        m_IsStopBodyRot = context.ReadValueAsButton();
     }
 
     private void OnChangeLeftView(InputAction.CallbackContext context)
@@ -244,7 +246,7 @@ public class PlayerInputManager : MonoBehaviour
     public void SetIsRunInput(bool isRun)
     {
         m_IsRun_LocoF = isRun;
-        switch (m_IsRun_LocoF)
+        /*switch (m_IsRun_LocoF)
         {
             case true:
                 m_StateFlagManager.SetLocomotionFlag(LocomotionSubFlags.Run);
@@ -253,13 +255,13 @@ public class PlayerInputManager : MonoBehaviour
             case false:
                 m_StateFlagManager.ClearLocomotionFlag(LocomotionSubFlags.Run);
                 break;
-        }
+        }*/
     }
 
     public void SetIsCrouchInput(bool isCrouch)
     {
         m_IsCrouch_LocoF = isCrouch;
-        switch (m_IsCrouch_LocoF)
+        /*switch (m_IsCrouch_LocoF)
         {
             case true:
                 m_StateFlagManager.SetLocomotionFlag(LocomotionSubFlags.Crouch);
@@ -268,7 +270,7 @@ public class PlayerInputManager : MonoBehaviour
             case false:
                 m_StateFlagManager.ClearLocomotionFlag(LocomotionSubFlags.Crouch);
                 break;
-        }
+        }*/
     }
 
     #endregion ======================================== Flags
@@ -277,7 +279,7 @@ public class PlayerInputManager : MonoBehaviour
 
     public void SetIsInAirInput(bool isJump)
     {
-        m_IsInAir_LocoM = isJump;
+        m_IsJump_LocoM = isJump;
     }
 
     public void SetIsDodgeInput(bool isDodge)

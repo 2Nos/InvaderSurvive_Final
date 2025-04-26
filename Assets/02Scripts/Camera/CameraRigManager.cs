@@ -1,16 +1,13 @@
 // ============================== 250418
 //하이어라키 구조
-//Player
+//PlayerCore
 //├── target_FollowCam (View 높이)
 
 //CameraRig (CameraRigManager, target_FollowCam와 글로벌 위치 동일하게)
 //├── Pivot(Empty, 어깨와의 거리)
 //│   └── MainCamera(실제 카메라, Pivot과의 거리 유지)
 //============================== 
-using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class CameraRigManager : MonoBehaviour
 {
@@ -20,7 +17,7 @@ public class CameraRigManager : MonoBehaviour
 
     [Header("[ CameraRig의 추적 대상 ]")]
     [SerializeField] private Transform m_target_FollowCamTr;        // 카메라의 특정 위치 (Player의 하위객체, 계산 시 LocalPos 사용)
-    [Tooltip("뷰가 높이"),SerializeField] float m_followTargetHeight = 1.4f;
+    [Tooltip("뷰가 높이"), SerializeField] float m_followTargetHeight = 1.4f;
 
     [Header("[ 에임 설정 ]")]
     [SerializeField] private Transform m_target_AimTr;              // 애니메이션 리깅을 위한 타겟
@@ -35,10 +32,10 @@ public class CameraRigManager : MonoBehaviour
     [SerializeField] float m_pivotOffsetX = 0.5f;                   // pivot의 위치 (어깨와의 옆 거리)
 
     [SerializeField] private Camera m_mainCamera;                   //pivot 하위 객체 (pivot와의 거리만 판별 필요)
-    [SerializeField] float m_minCameraDis = 0.5f;                           
+    [SerializeField] float m_minCameraDis = 0.5f;
     [SerializeField] float m_maxCameraDis = 2.5f;                   // Pivot과 카메라 사이의 기본 거리이자 최대 거리
 
-    [SerializeField] float m_rotationSensitivity = 10f;             // 마우스 회전 감도, Speed
+    [SerializeField] float m_rotationSensitivity = 10f;             // 마우스 회전 감도, SetCurrentSpeed
     [SerializeField] float m_downAngle = 60f;                       // 수직 회전 최소 각도 (계산 시 -로)
     [SerializeField] float m_upAngle = 35f;                         // 수직 회전 최대 각도
 

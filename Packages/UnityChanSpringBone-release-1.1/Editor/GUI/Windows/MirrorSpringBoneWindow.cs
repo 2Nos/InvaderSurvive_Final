@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Unity.Animations.SpringBones.GameObjectExtensions;
 using UnityEditor;
 using UnityEngine;
-using Unity.Animations.SpringBones.GameObjectExtensions;
 
 namespace Unity.Animations.SpringBones
 {
@@ -156,7 +156,7 @@ namespace Unity.Animations.SpringBones
         private static T FindMirroredComponent<T>(GameObject rootObject, T sourceObject, Axis mirrorAxis, float threshold)
             where T : Component
         {
-            if (rootObject == null 
+            if (rootObject == null
                 || sourceObject == null)
             {
                 return null;
@@ -172,9 +172,9 @@ namespace Unity.Animations.SpringBones
 
         private static IEnumerable<T> FindMirroredComponents<T>
         (
-            GameObject rootObject, 
-            IEnumerable<T> sourceObjects, 
-            Axis mirrorAxis, 
+            GameObject rootObject,
+            IEnumerable<T> sourceObjects,
+            Axis mirrorAxis,
             float threshold = 0.001f
         ) where T : Component
         {
@@ -254,7 +254,7 @@ namespace Unity.Animations.SpringBones
         private void PerformMirror()
         {
             var mirrorItems = boneEntries.Where(
-                item => item.sourceBone != null 
+                item => item.sourceBone != null
                     && item.targetBone != null
                     && item.sourceBone != item.targetBone);
             var undoItems = mirrorItems.Select(item => (Component)item.targetBone).ToList();

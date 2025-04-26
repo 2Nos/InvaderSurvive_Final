@@ -1,8 +1,6 @@
-﻿using System.Runtime.CompilerServices;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using UnityEngine.Windows;
 
 public enum JoystickType
 {
@@ -41,7 +39,7 @@ namespace DUS.Joystick
             m_joystickLeverRectTr = m_joystickLeverImange.GetComponent<RectTransform>();
 
             //UI의 사이즈가 리사이징되는 순간 다시 계산해야함 그래서 OnPointerDown에서 계산함
-            m_joystickCenterPos  = m_joystickBackGroundRectTr.position;
+            m_joystickCenterPos = m_joystickBackGroundRectTr.position;
 
             //m_leverRange = m_joystickBackGroundRectTr.sizeDelta.x / 2; //조이스틱 움직일 영역 제한
         }
@@ -130,7 +128,7 @@ namespace DUS.Joystick
             {
                 m_joystickLeverRectTr.localPosition = m_joystickLeverRectTr.localPosition + (inputPos * joystickSpeed);
             }
-            else if(dis >= m_leverRange)
+            else if (dis >= m_leverRange)
             {
                 Vector2 current = m_joystickLeverRectTr.localPosition;
                 Vector2 target = inputPos.normalized * m_leverRange;
@@ -153,7 +151,7 @@ namespace DUS.Joystick
 
             if (dis < m_leverRange)
             {
-                m_joystickLeverRectTr.localPosition = m_joystickLeverRectTr.localPosition + (inputPos/10);
+                m_joystickLeverRectTr.localPosition = m_joystickLeverRectTr.localPosition + (inputPos / 10);
             }
             else if (dis >= m_leverRange)
             {

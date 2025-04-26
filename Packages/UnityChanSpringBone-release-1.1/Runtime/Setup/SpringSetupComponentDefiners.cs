@@ -1,7 +1,7 @@
-﻿using Unity.Animations.SpringBones.StringQueueExtensions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Unity.Animations.SpringBones.StringQueueExtensions;
 using UnityEngine;
 
 namespace Unity.Animations.SpringBones
