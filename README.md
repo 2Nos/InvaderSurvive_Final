@@ -2,8 +2,9 @@
 
 시작 : 2025.04 <br/>
 [ 상태 관리 ]<br/>
-1. FSM + Strategy패턴 활용 상태 관리  <br/>
-2. 주력 상태 MainState(단일) + Flags(복수개)를 활용한 SubState 적용  <br/>
+1. PlayerCore에서의 Locomotion, Combat 관리 <br/>
+2. Locomotion과 Combat 상태들 FSM + Strategy패턴으로 관리  <br/>
+3. MainState(주력 단일 상태) + Flags(복수개)를 활용한 SubState 적용  <br/>
 
 PlayerCore <br/>
 ├── 공통 <br/>
