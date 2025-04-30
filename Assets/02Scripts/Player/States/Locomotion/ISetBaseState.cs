@@ -1,4 +1,5 @@
 using UnityEngine;
+using DUS.Player.Locomotion;
 
 public interface ISetBaseState
 {

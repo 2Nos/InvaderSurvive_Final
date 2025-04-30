@@ -1,62 +1,66 @@
 using Unity.Hierarchy;
 using UnityEngine;
 using System.Linq;
+using DUS.Player.Locomotion;
 
-public class JumpState : LocomotionBaseState
+public class JumpState : LocomotionStrategyState
 {
     public JumpState(PlayerCore playerCore) : base(playerCore) { }
-    public override LocomotionMainState DetermineStateType() => LocomotionMainState.Jump;
-    public override AniParmType SetAniParmType() => AniParmType.SetTrigger;
+    protected override LocomotionMainState DetermineStateType() => LocomotionMainState.Jump;
+    protected override AniParmType SetAniParmType() => AniParmType.SetTrigger;
 
-    float m_delayCheckTime = 0.5f;
+    private float m_JumpTimer;
 
     public override void Enter()
     {
         base.Enter();
-        ExecuteJump();
+
+        m_PlayerCore.SetRigidVelocity(m_Locomotion.m_CurrentVelocity/2);
+        m_PlayerCore.SetRigidVelocityY(0);
+        m_JumpTimer = 0f;
+
+    }
+
+    public override void FixedUpdate()
+    {
+        base.FixedUpdate();
+        if (!m_PlayerCore.m_AnimationManager.m_IsJumpStart) return;
+
+        UpdateJumpForce();
     }
 
     public override void Update()
     {
         base.Update();
 
-        if(m_delayCheckTime >= 0)
-        {
-            m_delayCheckTime -= Time.deltaTime;
-        }
-        else
-        {
-            if (!m_Locomotion.m_IsGrounded)
-            {
-                m_Locomotion.ChangeMainState(LocomotionMainState.Idle);
-            }
-        }
     }
 
     public override void Exit()
     {
         base.Exit();
-        m_delayCheckTime = 0.5f;
+        m_PlayerCore.m_AnimationManager.m_IsJumpStart = false;
     }
 
-    public override void Movement()
+    public override void UpdateMovement()
     {
-        //m_Locomotion.HandleGravityMovement();
+        m_Locomotion.HandleRotation();
     }
 
-    public void ExecuteJump()
+    public void UpdateJumpForce()
     {
-        var key = m_Locomotion.m_MainStateMap.FirstOrDefault(x => x.Value == m_Locomotion.m_prevState).Key;
-        switch (key)
+        // 자연스럽게 점프포스를 주는 계산
+        m_JumpTimer += Time.fixedDeltaTime;
+        float t = m_JumpTimer / m_PlayerCore.m_JumpDuration;
+
+        if (t < 1f)
         {
-            case LocomotionMainState.Idle:
-                m_PlayerCore.m_AnimationManager.SetParmTrigger("IdleJump");
-                break;
-            case LocomotionMainState.Move:
-                m_PlayerCore.m_AnimationManager.SetParmTrigger("MoveJump");
-                break;
+            float force = m_PlayerCore.m_JumpForce * m_PlayerCore.m_JumpCurve.Evaluate(t);
+            m_PlayerCore.SetRigidVelocityY(force);
+            m_Locomotion.m_CurrentVelocityY = force;
         }
-        m_PlayerCore.m_Rigidbody.AddForce(m_PlayerCore.transform.up * m_PlayerCore.m_jumpUpForce, ForceMode.Impulse); //점프 힘을 주기 위해 Rigidbody에 힘을 줌
-        //m_NotGravity = true; //중력 무시 상태
+        else
+        {
+            m_Locomotion.SetNextState(LocomotionMainState.InAir);
+        }
     }
 }

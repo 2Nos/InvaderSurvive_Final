@@ -1,46 +1,50 @@
+using System.Threading.Tasks;
 using UnityEngine;
-public class SlideState : LocomotionBaseState
+using DUS.Player.Locomotion;
+
+public class SlideState : LocomotionStrategyState
 {
     public SlideState(PlayerCore playerCore) : base(playerCore) { }
+    protected override LocomotionMainState DetermineStateType() => LocomotionMainState.Slide;
+    protected override AniParmType SetAniParmType() => AniParmType.SetBool; //슬라이딩 상태와 시작의 Trigger가 필요
 
-    public override LocomotionMainState DetermineStateType() => LocomotionMainState.Slide;
-
-    public override AniParmType SetAniParmType() => AniParmType.SetBool;
-
-    float m_slideTime;
-    public override void Enter()
+    bool ischeck;
+    public  override void Enter()
     {
         base.Enter();
+        m_PlayerCore.m_InputManager.SetFlagKey(false, false, true); // 슬라이드 상태에서는 키 입력을 받지 않도록 설정
         m_PlayerCore.m_AnimationManager.SetParmTrigger("Slide");
-        m_PlayerCore.m_InputManager.SetFlagKey(false, false,true); // 슬라이드 상태에서는 키 입력을 받지 않도록 설정
-        m_PlayerCore.OnChangeColider(false);
-        m_slideTime = 3f;
+        m_DelayTime = 3f;
     }
 
     public override void Update()
     {
         base.Update();
-        if (m_slideTime >= 0)
+        
+        CheckTransitionedNextAnimation("SlideStart");
+
+        if (!m_IsNextStateCheck) return;
+        if (m_AnimationTime >= 0)
         {
-            m_slideTime -= Time.fixedDeltaTime;
+            m_AnimationTime -= Time.fixedDeltaTime;
             UpdateSliding();
         }
         else
         {
-            m_Locomotion.ChangeMainState(LocomotionMainState.Idle);
+            m_Locomotion.SetNextState(LocomotionMainState.Idle);
         }
+
     }
 
     public override void Exit()
     {
         base.Exit();
-        m_Locomotion.ClearAllLocomotionFlags();
+        //m_Locomotion.ClearAllLocomotionFlags();
         m_PlayerCore.m_InputManager.SetFlagKey(false, false,false);
         m_PlayerCore.OnChangeColider(true);
-        m_slideTime = 2f;
     }
 
-    public override void Movement()
+    public override void UpdateMovement()
     {
         m_Locomotion.HandleRotation();
 

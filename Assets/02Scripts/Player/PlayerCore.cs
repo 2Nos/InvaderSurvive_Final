@@ -6,11 +6,11 @@
 // IsAiming, IsSprinting, IsCrouching은 같은 복수가 가능한 State들은 SubFlags로 관리
 
 // ========================================
+using DUS.Player.Locomotion;
 using UnityEngine;
 using System.Collections.Generic;
 using DUS.Joystick;
 
-[RequireComponent(typeof(CapsuleCollider))]
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(MainStateAndSubFlagsManager))]
 [RequireComponent(typeof(PlayerInputManager))] // InputManager컴포넌트를 종속성으로 PlayerCore있는 곳에 자동으로 추가
@@ -18,33 +18,16 @@ using DUS.Joystick;
 public class PlayerCore : MonoBehaviour
 {
     #region ======================================== Module
-    /*private static PlayerCore instance;
-    public static PlayerCore Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                instance = FindObjectOfType<PlayerCore>();
-                if (instance == null)
-                {
-                    Debug.LogError("PlayerCore instance not found in the scene.");
-                }
-            }
-            return instance;
-        }
-    }*/
     public PlayerInputManager m_InputManager { get; private set; }
+    public PlayerLocomotion m_Locomotion { get; private set; }
+    public PlayerCombat m_Combat { get; private set; }
     public MainStateAndSubFlagsManager m_StateFlagManager { get; private set; }
     public PlayerAnimationManager m_AnimationManager { get; private set; }
     public CameraRigManager m_CameraManager { get; private set; }
-    public PlayerLocomotion m_Locomotion { get; private set; }
-    public PlayerCombat m_Combat { get; private set; }
     #endregion ======================================== /Module
 
     #region ======================================== Player Value - Locomotion
-    [Header("[ PlayerCore Move ]")]
-    //SetCurrentSpeed
+    [Header("[ Move ]")]
     [Range(1, 10)] public float m_walkSpeed = 5f;
     [Range(1, 20)] public float m_runSpeed = 15f;
     [Range(1, 10)] public float m_crouchSpeed = 3f;
@@ -54,9 +37,15 @@ public class PlayerCore : MonoBehaviour
     [Range(1, 10)] public float m_SlideSpeed = 5f;
     [Range(1, 10)] public float m_ClimbSpeed = 5f;
     [Range(1, 10)] public float m_WallRunSpeed = 5f;
-    [Range(1, 10)] public float m_jumpSpeed = 5f;
-    [Range(1, 100)] public float m_jumpUpForce = 5f;
-    [Range(-10, 0.1f)] public float m_Gravity = -9.8f;
+
+    [Header("[ Jump ]")]
+    [Range(1, 100)] public float m_JumpForce = 10f;
+    [SerializeField] public float m_JumpDuration = 1f;
+    [SerializeField] public AnimationCurve m_JumpCurve = AnimationCurve.EaseInOut(0f, 1f, 1f, 0f); // m_JumpDuration 동안 1 → 0 로 곡선 변환
+
+    [Header("[ Gravity ]")]
+    [Range(1, 10)] public float m_AddGravity = 1.5f;
+    public LayerMask m_GroundMask;
     public float m_CurrentSpeed { get; private set; } //현재 속도
 
     [Range(1, 50)] public float m_MaxVelocityY = 30;
@@ -67,8 +56,10 @@ public class PlayerCore : MonoBehaviour
     [Range(1, 60)] public float m_rotationDamping; //회전 감속
     #endregion ======================================== /Player Value Locomotion
 
+    #region ======================================== Player Value - Combat
     [Range(1, 50)] public float m_rotationAimSpeed; //에임 상태에서의 회전 속도
-    public LayerMask m_GroundMask;
+
+    #endregion ======================================== /Player Value Combat
     public Rigidbody m_Rigidbody { get; private set; }
     public CapsuleCollider[] m_CapsuleCollider { get; private set; }
     public float m_CurrentRotSpeed { get; private set; }
@@ -90,12 +81,13 @@ public class PlayerCore : MonoBehaviour
         m_Locomotion = new PlayerLocomotion(this);
         //m_Combat = new PlayerCombat(this);
 
-        m_Rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
+        m_Rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous; //리지드바디 감지 모드 변경
+        Application.targetFrameRate = 300; //Fixed 프레임 변경
     }
     private void Start()
     {
         OnChangeColider(true);
-        m_Locomotion.InitializeLocomotion();
+        m_Locomotion.InitializeLocomotionAtStart();
         m_CurrentSpeed = m_walkSpeed;
         m_CurrentRotSpeed = m_rotationSpeed;
         //m_Rigidbody.transform.position = Vector3.zero;

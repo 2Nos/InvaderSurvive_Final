@@ -1,4 +1,4 @@
-/*public class DodgeState : LocomotionBaseState
+/*public class DodgeState : LocomotionStrategyState
 {
     public DodgeState(PlayerCore playerCore) : base(playerCore){}
 
