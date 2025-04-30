@@ -1,8 +1,10 @@
-public class WallRunState : LocomotionBaseState
+using DUS.Player.Locomotion;
+
+public class WallRunState : LocomotionStrategyState
 {
     public WallRunState(PlayerCore playerCore) : base(playerCore){}
 
-    public override LocomotionMainState DetermineStateType() => LocomotionMainState.WallRun;
+    protected override LocomotionMainState DetermineStateType() => LocomotionMainState.WallRun;
 
-    public override AniParmType SetAniParmType() => AniParmType.SetBool;
+    protected override AniParmType SetAniParmType() => AniParmType.SetBool;
 }

@@ -1,4 +1,4 @@
-/*public class StaggeredState : LocomotionBaseState
+/*public class StaggeredState : LocomotionStrategyState
 {
     public StaggeredState(PlayerCore playerCore) : base(playerCore){}
 

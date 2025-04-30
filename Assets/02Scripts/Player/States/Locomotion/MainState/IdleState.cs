@@ -1,61 +1,56 @@
 using UnityEngine;
+using DUS.Player.Locomotion;
 
-public class IdleState : LocomotionBaseState
+public class IdleState : LocomotionStrategyState
 {
     public IdleState(PlayerCore playerCore) : base(playerCore) { }
-    public override LocomotionMainState DetermineStateType() => LocomotionMainState.Idle;
+    protected override LocomotionMainState DetermineStateType() => LocomotionMainState.Idle;
 
     //public override bool StopCheckTransitionToInProgress() => false; // 딱히 필요 없음
-    public override AniParmType SetAniParmType() => AniParmType.SetBool;
+    protected override AniParmType SetAniParmType() => AniParmType.SetBool;
     public override void Enter()
     {
         base.Enter();
 
-        m_PlayerCore.SetCurrentMoveSpeed(0f);
-        m_PlayerCore.SetRigidVelocity(Vector3.zero);
-        InitializeIdle();
+        //m_PlayerCore.SetCurrentMoveSpeed(0f);
+        //m_Locomotion.InitializeVelocity();
+        //if(m_Locomotion.m_IsGrounded) m_PlayerCore.SetRigidVelocity(Vector3.zero);
     }
 
     public override void FixedUpdate()
     {
-        // 1. Movement 동작
+        // 1. UpdateMovement 동작
         base.FixedUpdate();
     }
 
     public override void Update()
     {
-        //Flags
-        if (m_PlayerCore.m_InputManager.m_IsCrouch_LocoF)
-        {
-            m_Locomotion.SetLocomotionFlag(LocomotionSubFlags.Crouch);
-        }
-        else if(!m_PlayerCore.m_InputManager.m_IsCrouch_LocoF)
-        {
-            m_Locomotion.ClearLocomotionFlag(LocomotionSubFlags.Crouch);
-        }
+        base.Update();
+        bool isCrouch = m_PlayerCore.m_InputManager.m_IsCrouch_LocoF;
+        bool isJump = m_PlayerCore.m_InputManager.m_IsJump_LocoM;
+        bool isMove = m_PlayerCore.m_InputManager.m_IsMove_LocoM;
+
+        HandleCheckFlags(LocomotionSubFlags.Crouch, isCrouch);
 
         // Main
-        if(m_PlayerCore.m_InputManager.m_IsJump_LocoM)
+        if (isJump)
         {
-            m_Locomotion.ChangeMainState(LocomotionMainState.Jump);
+            m_Locomotion.SetNextState(LocomotionMainState.Jump);
         }
-        else if (m_PlayerCore.m_InputManager.m_IsMove_LocoM)
+        else if (isMove)
         {
-            m_Locomotion.ChangeMainState(LocomotionMainState.Move);
+            m_Locomotion.SetNextState(LocomotionMainState.Move);
         }
-
-        // 애니메이션 및 변환 상태 생성
-        base.Update();
     }
     public override void Exit()
     {
         base.Exit();
     }
 
-    public override void Movement()
+    public override void UpdateMovement()
     {
         m_Locomotion.HandleRotation();
-        if(!m_Locomotion.m_IsGrounded) m_Locomotion.HandleGravityMovement();
+        //if(!m_Locomotion.m_IsGrounded) m_Locomotion.HandleGravityMovement();
     }
 
 }

@@ -1,17 +1,20 @@
-public class MoveState : LocomotionBaseState
+using DUS.Player.Locomotion;
+
+public class MoveState : LocomotionStrategyState
 {
     public MoveState(PlayerCore playerCore) : base(playerCore) { }
 
-    public override LocomotionMainState DetermineStateType() => LocomotionMainState.Move;
-    public override AniParmType SetAniParmType() => AniParmType.SetBool;
+    protected override LocomotionMainState DetermineStateType() => LocomotionMainState.Move;
+    protected override AniParmType SetAniParmType() => AniParmType.SetBool;
     public override void Enter()
     {
         base.Enter();
         m_PlayerCore.SetCurrentMoveSpeed(m_PlayerCore.m_walkSpeed);
+
     }
     public override void FixedUpdate()
     {
-        // 1. Movement 동작
+        // 1. UpdateMovement 동작
         base.FixedUpdate();
     }
     public override void Update()
@@ -20,75 +23,67 @@ public class MoveState : LocomotionBaseState
         base.Update();
 
         //Flags && Speed 관리
-        m_PlayerCore.SetCurrentMoveSpeed(m_PlayerCore.m_walkSpeed);
-
         bool isRunning = m_PlayerCore.m_InputManager.m_IsRun_LocoF;
         bool isCrouching = m_PlayerCore.m_InputManager.m_IsCrouch_LocoF;
         bool isMoving = m_PlayerCore.m_InputManager.m_IsMove_LocoM; // 이동 입력 여부
+        bool isJumping = m_PlayerCore.m_InputManager.m_IsJump_LocoM;
 
-        // 3. 현재 SubFlag 상태
-        bool isCurrentlyRunning = m_Locomotion.HasLocomotionFlag(LocomotionSubFlags.Run);
-        bool isCurrentlyCrouching = m_Locomotion.HasLocomotionFlag(LocomotionSubFlags.Crouch);
-        bool isCurrentlyCrouchRunning = m_Locomotion.HasLocomotionFlag(LocomotionSubFlags.CrouchRun);
+        // 3. 5가 되기전의 이전 SubFlag 상태 체크
+        bool hasRun = m_Locomotion.m_StateUtility.HasLocomotionFlag(LocomotionSubFlags.Run);
+        bool hasCrouch = m_Locomotion.m_StateUtility.HasLocomotionFlag(LocomotionSubFlags.Crouch);
+        bool hasCrouchRun = m_Locomotion.m_StateUtility.HasLocomotionFlag(LocomotionSubFlags.CrouchRun);
 
-        // 4. 슬라이드 진입 조건 (달리기 중 앉기)
-        if (isCurrentlyRunning && isCrouching)
+        // 4. 각 진입 조건 
+        if (!hasCrouch && hasRun && isCrouching)             // 달리기 중 앉기 = 슬라이드
         {
             // 슬라이드 시작
-            m_Locomotion.ChangeMainState(LocomotionMainState.Slide);
+            m_Locomotion.SetNextState(LocomotionMainState.Slide);
+            HandleCheckFlags(LocomotionSubFlags.Crouch, isCrouching);
             return;
         }
 
-        // 5. SubFlag 상태 관리
-        m_Locomotion.ClearAllLocomotionFlags(); // 일단 매프레임 리셋하고 다시 세팅하는 방식
-
-        if (isCrouching)
+        if (isRunning && isCrouching)       // 앉기 중 달리기 = 앉으며 달리기
         {
-            m_Locomotion.SetLocomotionFlag(LocomotionSubFlags.Crouch);
-
-            if (isRunning && isMoving)
-            {
-                m_Locomotion.SetLocomotionFlag(LocomotionSubFlags.CrouchRun);
-                m_PlayerCore.SetCurrentMoveSpeed(m_PlayerCore.m_crouchRunSpeed);
-            }
-            else
-            {
-                m_PlayerCore.SetCurrentMoveSpeed(m_PlayerCore.m_crouchSpeed);
-            }
+            m_PlayerCore.SetCurrentMoveSpeed(m_PlayerCore.m_crouchRunSpeed);
+            hasCrouchRun = true;
+        }
+        else if (isRunning)          // 일반 달리기
+        {
+            m_PlayerCore.SetCurrentMoveSpeed(m_PlayerCore.m_runSpeed);
+            hasCrouchRun = false;
+        }
+        else if (isCrouching)       // 일반 앉기
+        {
+            m_PlayerCore.SetCurrentMoveSpeed(m_PlayerCore.m_crouchSpeed);
+            hasCrouchRun = false;
         }
         else
         {
-            if (isRunning && isMoving)
-            {
-                m_Locomotion.SetLocomotionFlag(LocomotionSubFlags.Run);
-                m_PlayerCore.SetCurrentMoveSpeed(m_PlayerCore.m_runSpeed);
-            }
-            else if (isMoving)
-            {
-                m_PlayerCore.SetCurrentMoveSpeed(m_PlayerCore.m_walkSpeed);
-            }
+            m_PlayerCore.SetCurrentMoveSpeed(m_PlayerCore.m_walkSpeed);
+            hasCrouchRun = false;
         }
 
+        // 5. SubFlag 업데이트
+        HandleCheckFlags(LocomotionSubFlags.CrouchRun, hasCrouchRun);
+        HandleCheckFlags(LocomotionSubFlags.Run, isRunning);
+        HandleCheckFlags(LocomotionSubFlags.Crouch, isCrouching);
+
+
         // ChangeMain
-        if (m_PlayerCore.m_InputManager.m_IsJump_LocoM)
+        if (isJumping)
         {
-            m_Locomotion.ChangeMainState(LocomotionMainState.Jump);
+            m_Locomotion.SetNextState(LocomotionMainState.Jump);
         }
-        else if (!m_PlayerCore.m_InputManager.m_IsMove_LocoM)
+        else if (!isMoving)
         {
-            m_Locomotion.ChangeMainState(LocomotionMainState.Idle);
+            m_Locomotion.SetNextState(LocomotionMainState.Idle);
         }
 
     }
     public override void Exit()
     {
         base.Exit();
-        InitializeMove();
-    }
+        m_Locomotion.m_StateUtility.AllClearFlags(m_PlayerCore.m_AnimationManager.m_Animator);
 
-    private void InitializeMove()
-    {
-        m_Locomotion.ClearAllLocomotionFlags();
     }
-
 }

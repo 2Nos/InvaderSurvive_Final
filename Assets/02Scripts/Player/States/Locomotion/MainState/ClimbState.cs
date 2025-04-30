@@ -1,14 +1,12 @@
+using DUS.Player.Locomotion;
 
-public class ClimbState : LocomotionBaseState
+public class ClimbState : LocomotionStrategyState
 {
     public ClimbState(PlayerCore playerCore) : base(playerCore) { }
 
-    public override LocomotionMainState DetermineStateType() => LocomotionMainState.Climb;
+    protected override LocomotionMainState DetermineStateType() => LocomotionMainState.Climb;
 
-    public override AniParmType SetAniParmType()
-    {
-        throw new System.NotImplementedException();
-    }
+    protected override AniParmType SetAniParmType() => AniParmType.SetBool;
 
     //public override LocomotionMainState DetermineStateType() => LocomotionMainState.Climb;
 }

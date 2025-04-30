@@ -41,6 +41,8 @@ public class CameraRigManager : MonoBehaviour
 
     [SerializeField] private LayerMask m_cameraMask;
 
+    [SerializeField] float aimPosSpeed = 20;
+
     public float m_MouseX { get; private set; }
     public float m_MouseY { get; private set; }
 
@@ -162,7 +164,7 @@ public class CameraRigManager : MonoBehaviour
         }
 
         Vector3 finalAimPos = m_pivotTr.position + m_pivotTr.forward * distance;
-        m_target_AimTr.position = Vector3.Lerp(m_target_AimTr.position, finalAimPos, Time.deltaTime * 10f);
+        m_target_AimTr.position = Vector3.Lerp(m_target_AimTr.position, finalAimPos, Time.deltaTime * aimPosSpeed);
 
         return m_target_AimTr.position;
     }

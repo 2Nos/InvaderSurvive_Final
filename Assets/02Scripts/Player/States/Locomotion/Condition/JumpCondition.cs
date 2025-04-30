@@ -14,7 +14,7 @@
         return Input.GetKeyDown(KeyCode.Space);
     }
 
-    public LocomotionBaseState GetNextState()
+    public LocomotionStrategyState GetNextState()
     {
         return new InAirState(locomotion);
     }
