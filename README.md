@@ -7,7 +7,7 @@
 
 PlayerCore <br/>
 ├── 공통 <br/>
-│   ├── Rigidbody 관리 (PlayerPhysicsUtility) <br/>
+│   ├── Rigidbody 관리 (PlayerPhysicsUtility)
 │   ├── 입력 매니저, 애니메이션 매니저 참조 <br/>
 │   └── 공통 기능 (Collider 스위치 등) <br/>
 ├── Locomotion <br/>
