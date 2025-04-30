@@ -1,24 +1,20 @@
 # InvaderSurvive_Final
-바이브 코딩을 활용한 개발 도전
 
 시작 : 2025.04 <br/>
-상태 관리 : 각 메인상태들과 Flags를 활용한 복수개 상태 관리 <br/>
+[ 상태 관리 ]<br/>
+1. FSM + Strategy 패턴을 활용 상태들과  <br/>
+2. 주력 상태 MainState(단일) + Flags(복수개)를 활용한 SubState 적용 관리  <br/>
 
-![image](https://github.com/user-attachments/assets/6fca33f9-d112-422c-8f5d-912bda2770c9)
-
-
-![image](https://github.com/user-attachments/assets/6fa25375-89e7-4fba-b386-521f75e6e891) 
-<br>
-
-[카메라 하이어라키 구조]<br>
-Player<br>
-├── target_FollowCam (View 높이)<br>
-<br>
-CameraRig (CameraRigManager, target_FollowCam와 글로벌 위치 동일하게)<br>
-├── Pivot(Empty, 어깨와의 거리)<br>
-│   └── MainCamera(실제 카메라, Pivot과의 거리 유지)<br>
-
-[카메라 회전]
-- 평소엔 정면 유지
-- 에임 시 살짝 Lerp 회전해서 에임 방향 응시
-- 에임을 해제하면 천천히 원래 정면 방향으로 복귀
+PlayerCore <br/>
+├── 공통 <br/>
+│   ├── Rigidbody 관리 (PlayerPhysicsUtility) <br/>
+│   ├── 입력 매니저, 애니메이션 매니저 참조 <br/>
+│   └── 공통 기능 (Collider 스위치 등) <br/>
+├── Locomotion <br/>
+│   ├── PlayerLocomotion 모듈 초기화 <br/>
+│   ├── 속도, 회전 값 세팅 <br/>
+│   └── 이동 관련 Update/FixedUpdate 호출 <br/>
+└── Combat <br/>
+    ├── PlayerCombat 모듈 초기화 (예정) <br/>
+    ├── 공격, 피격 처리 <br/>
+    └── 전투 관련 Update/FixedUpdate 호출 <br/>
