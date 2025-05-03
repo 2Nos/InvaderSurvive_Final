@@ -6,10 +6,9 @@
 // IsAiming, IsSprinting, IsCrouching은 같은 복수가 가능한 State들은 SubFlags로 관리
 
 // ========================================
-using DUS.Player.Locomotion;
 using UnityEngine;
-using System.Collections.Generic;
-using DUS.Joystick;
+using DUS.Player.Locomotion;
+using DUS.Player.Combat;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(MainStateAndSubFlagsManager))]
@@ -139,17 +138,8 @@ public class PlayerCore : MonoBehaviour
         m_Locomotion?.LateUpdate();
     }
 
-    //TODO : Combat에서 경직이나 특정 메인 상태에 준하는 행위의 경우
-    //Locomotion의 메인 상태 멈출 수 있게하는 내용들 정리
-    public void CanMove()
-    {
-        
-    }
-
-    public void CanRot()
-    {
-
-    }
+    //TODO : Locomotion과 Combat의 서로 영향을 주는 상태 발생 시 관리하는 역할 작성
+    bool m_IsLocomotion, m_IsCombat;
 
 
     #region ======================================== Set Player Value - Locomotion

@@ -4,8 +4,6 @@
 
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-
 namespace DUS.Player.Locomotion
 {
     public enum LocomotionMainState
@@ -26,7 +24,7 @@ namespace DUS.Player.Locomotion
     /// <summary>
     /// Flags는 복수의 열거형 선택이 가능한 기능. 즉, 복수 상태가 가능
     /// Flags는 2의 제곱수나 2의 제곱수 조합을 사용하여 선언해야함
-    /// None =0, FalgButtonGroupManager = 1, Croucning = 2, 4, 8 이런식 보다는 쉬프트연산)
+    /// CombatIdleState =0, FalgButtonGroupManager = 1, Croucning = 2, 4, 8 이런식 보다는 쉬프트연산)
     /// </summary>
     [Flags]
     public enum LocomotionSubFlags
@@ -40,11 +38,9 @@ namespace DUS.Player.Locomotion
     public class LocomotionStateUtility
     {
         #region ======================================== MainState 관리
-
-        // ========== Map ==========
-        public Dictionary<LocomotionMainState, LocomotionStrategyState> m_MainStrategyMap = new();
+        public Dictionary<LocomotionMainState, LocomotionStrategyState> m_MainStrategyMap { get; private set; } = new();
         //SetBool = 0번 인덱스, SetTrigger = 1번
-        private readonly Dictionary<LocomotionMainState, string[]> m_MainStateAniParmMap = new()
+        public Dictionary<LocomotionMainState, string[]> m_MainStateAniParmMap { get; private set; } = new()
         {
             { LocomotionMainState.Idle, new string[]{"IsIdle" } },
             { LocomotionMainState.Move, new string[]{"IsMove" } },
@@ -66,68 +62,26 @@ namespace DUS.Player.Locomotion
             m_MainStrategyMap[LocomotionMainState.Climb] = new ClimbState(player);
             m_MainStrategyMap[LocomotionMainState.WallRun] = new WallRunState(player);
         }
-        public void SetMainStateAnimation(LocomotionMainState locomotionMainState, Animator animator, AniParmType[] aniParmType, bool isPlay = false)
-        {
-
-            if (m_MainStateAniParmMap.TryGetValue(locomotionMainState, out var parmNames))
-            {
-                for (int i = 0; i < parmNames.Length && i< aniParmType.Length; i++) //i < parmNames.Length && i< aniParmType.Length -> 길이 확실히 같은지 
-                {
-                    switch (aniParmType[i])
-                    {
-                        case AniParmType.SetBool:
-                            animator.SetBool(parmNames[0], isPlay);
-                            break;
-                        case AniParmType.SetTrigger:
-                            animator.SetBool(parmNames[1], isPlay);
-                            break;
-                    }
-                }
-
-            }
-        }
+        
         #endregion ======================================== /MainSate 관리
 
-
         #region ======================================== SubFlags 관리
-        private HashSet<LocomotionSubFlags> m_CurrentFlags = new();
-        private readonly Dictionary<LocomotionSubFlags, string> m_FlagAniMap = new()
+        private HashSet<LocomotionSubFlags> m_CurrentFlagsHash = new();
+        public Dictionary<LocomotionSubFlags, string> m_FlagAniMap { get; private set; } = new()
         {
+            { LocomotionSubFlags.None, "IsNone" },
             { LocomotionSubFlags.Run, "IsRun" },
             { LocomotionSubFlags.Crouch, "IsCrouch" },
             { LocomotionSubFlags.CrouchRun, "IsCrouchRun" },
         };
 
         //HashSet은 Add 중복 자동 방지
-        /// <summary>
         /// Flag + Ani 모두 변경
-        /// </summary>
-        /// <param name="flag"></param>
-        /// <param name="animator"></param>
-        public void SetLocomotionFlag(LocomotionSubFlags flag, Animator animator)
-        {
-            animator.SetBool(m_FlagAniMap[flag], true);
-            m_CurrentFlags.Add(flag); 
-        }
-
-        public void RemoveLocomotionFlag(LocomotionSubFlags flag, Animator animator)
-        {
-            animator.SetBool(m_FlagAniMap[flag], false);
-            m_CurrentFlags.Remove(flag);
-        }
-        public bool HasLocomotionFlag(LocomotionSubFlags flag) => m_CurrentFlags.Contains(flag);
-        public void AllClearFlags(Animator animator)
-        {
-            foreach (var flag in m_FlagAniMap.Keys)
-            {
-                animator.SetBool(m_FlagAniMap[flag], false);
-            }
-            
-            m_CurrentFlags.Clear();
-        } 
+        public void SetLocomotionFlag(LocomotionSubFlags flag) => m_CurrentFlagsHash.Add(flag);
+        public void RemoveLocomotionFlag(LocomotionSubFlags flag) => m_CurrentFlagsHash.Remove(flag);
+        public bool HasLocomotionFlag(LocomotionSubFlags flag) => m_CurrentFlagsHash.Contains(flag);
+        public void AllClearFlags() => m_CurrentFlagsHash.Clear();
+        
         #endregion ======================================== /SubFlags 관리
-
-
-
     }
 }

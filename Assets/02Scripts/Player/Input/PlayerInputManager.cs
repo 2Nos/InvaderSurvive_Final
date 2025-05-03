@@ -2,9 +2,10 @@
 // 플랫폼 입력 처리에 대한 완전한 관리는 PlayerInputManager에서 처리
 
 // ========================================
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-
+using DUS.Player.Locomotion;
 public enum InputType
 {
     Keyboard,
@@ -16,7 +17,7 @@ public class PlayerInputManager : MonoBehaviour
     public InputType m_InputType;
     public StateButtonGroupManager m_FlagButtonManager;
     public MainStateAndSubFlagsManager m_StateFlagManager;
-
+    public PlayerCore m_PlayerCore;
     #region ======================================== Locomotion
     public Vector2 m_MovementInput { get; private set; }
 
@@ -26,7 +27,7 @@ public class PlayerInputManager : MonoBehaviour
     public bool m_IsClimb_LocoM { get; private set; }               //벽에서 F
     public bool m_IsSlide_LocoM { get; private set; }               //달리다가 Left SHift + Space bar
     public bool m_IsWallRun_LocoM { get; private set; }             //벽에서 Shift + Space bar
-    public bool m_IsDodging_LocoA { get; private set; }             // C
+    public bool m_IsDodging_LocoA { get; private set; }             // C 
 
 
     public bool m_IsRun_LocoF { get; private set; }               //Left Shift
@@ -49,14 +50,25 @@ public class PlayerInputManager : MonoBehaviour
         // InputSystem_Actions 인스턴스 생성
         m_inputActions = new PlayerInputAC();
 
+        //m_IsSubFlagsMap
         if (m_InputType != InputType.Android)
         {
             Cursor.lockState = CursorLockMode.Locked; // 마우스 커서 잠금
         }
+
+        m_PlayerCore = GetComponent<PlayerCore>();
+
+        //Flag옵저버 패턴 적용
+       // m_PlayerCore.m_Locomotion.m_OnAllFlag += SetRunInput;
+    }
+
+    public void SetAllInputFlag(bool isBool)
+    {
+        SetRunInput(isBool);
+        SetCrouch(isBool);
     }
 
     #region ======================================== PC, GamePad
-
     private void OnEnable()
     {
         if (m_InputType == InputType.Android) return;
@@ -71,8 +83,7 @@ public class PlayerInputManager : MonoBehaviour
         m_inputActions.Player.Aim.canceled += OnAim;
 
         m_inputActions.Player.Run.performed += OnRun;
-
-        m_inputActions.Player.Crouch.performed += OnCrouch;
+        m_inputActions.Player.Crouch.performed += OnCrouchInput;
 
         m_inputActions.Player.Jump.performed += OnJump;
         m_inputActions.Player.Jump.canceled += OnJump;
@@ -114,7 +125,7 @@ public class PlayerInputManager : MonoBehaviour
 
         m_inputActions.Player.Run.performed -= OnRun;
 
-        m_inputActions.Player.Crouch.performed -= OnCrouch;
+        m_inputActions.Player.Crouch.performed -= OnCrouchInput;
 
         m_inputActions.Player.Jump.performed -= OnJump;
         m_inputActions.Player.Jump.canceled -= OnJump;
@@ -155,27 +166,26 @@ public class PlayerInputManager : MonoBehaviour
 
     private void OnRun(InputAction.CallbackContext context)
     {
-        ToggleRun();
-    }
-
-    public void ToggleRun()
-    {
         m_IsRun_LocoF = !m_IsRun_LocoF;
     }
-
-    private void OnCrouch(InputAction.CallbackContext context)
+    public void SetRunInput(bool isRun)
     {
-        ToggleCrouch();
+        m_IsRun_LocoF = isRun;
     }
-    // 실제 로직을 분리
-    public void ToggleCrouch()
+    private void OnCrouchInput(InputAction.CallbackContext context)
     {
         m_IsCrouch_LocoF = !m_IsCrouch_LocoF;
     }
+    public void SetCrouch(bool isCrouch)
+    {
+        m_IsCrouch_LocoF = isCrouch;
+    }
+
     private void OnJump(InputAction.CallbackContext context)
     {
         m_IsJump_LocoM = context.ReadValueAsButton();
     }
+
 
     private void OnAttack(InputAction.CallbackContext context)
     {
@@ -208,8 +218,6 @@ public class PlayerInputManager : MonoBehaviour
     }
 
     #endregion ======================================== PC, GamePad
-
-    #region ======================================== Android
     private const float AndroidInputSensitivity = 2f;
     public void SetMovementAndLookInput(Vector2 inputDir, JoystickType joystickType)
     {
@@ -224,40 +232,6 @@ public class PlayerInputManager : MonoBehaviour
                 break;
         }
     }
-
-    #region ======================================== InputFlags
-
-    public void SetIsRunInput(bool isRun)
-    {
-        m_IsRun_LocoF = isRun;
-        /*switch (m_IsRun_LocoF)
-        {
-            case true:
-                m_StateFlagManager.SetLocomotionFlag(LocomotionSubFlags.Run);
-                break;
-
-            case false:
-                m_StateFlagManager.ClearLocomotionFlag(LocomotionSubFlags.Run);
-                break;
-        }*/
-    }
-
-    public void SetIsCrouchInput(bool isCrouch)
-    {
-        m_IsCrouch_LocoF = isCrouch;
-        /*switch (m_IsCrouch_LocoF)
-        {
-            case true:
-                m_StateFlagManager.SetLocomotionFlag(LocomotionSubFlags.Crouch);
-                break;
-
-            case false:
-                m_StateFlagManager.ClearLocomotionFlag(LocomotionSubFlags.Crouch);
-                break;
-        }*/
-    }
-
-    #endregion ======================================== Flags
 
     #region ======================================== LocomotionMainState
 
@@ -277,7 +251,7 @@ public class PlayerInputManager : MonoBehaviour
 
     public void SetIsAttackInput(bool isAttack)
     {
-        if (m_StateFlagManager.m_CombatMain == CombatMainState.Shooting)
+        /*if (m_StateFlagManager.m_CombatMain == CombatMainState.Shooting)
         {
             m_IsAttacking = isAttack;
             //m_StateFlagManager.SetCombatFlag(.Aming);
@@ -285,9 +259,9 @@ public class PlayerInputManager : MonoBehaviour
         else if (m_StateFlagManager.m_CombatMain == CombatMainState.MeleeAttacking)
         {
             m_IsAttacking = isAttack;
-            //m_StateFlagManager.SetCombatFlag(CombatSubFlags.MeleeAttacking);
+            //m_StateFlagManager.SetCombatFlag(CombatSubFlags.MeleeAttack);
         }
-        else
+        else*/
             m_IsAttacking = isAttack;
     }
 
@@ -312,6 +286,4 @@ public class PlayerInputManager : MonoBehaviour
     {
         m_IsAim = isAim;
     }
-
-    #endregion ======================================== Android
 }

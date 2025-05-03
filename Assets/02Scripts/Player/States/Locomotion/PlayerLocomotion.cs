@@ -1,20 +1,20 @@
 //루터슈터 장르의 경우 물리 이동이 유리
 //Movment 관련
 
+using System;
 using UnityEngine;
 
 namespace DUS.Player.Locomotion {
     public class PlayerLocomotion
     {
         private PlayerCore m_playerCore;
-        private Animator m_Animator;
+        private Animator m_animator;
+        public LocomotionStateUtility m_StateUtility { get; private set; }
         public PlayerLocomotion(PlayerCore playerCore)
         {
             m_playerCore = playerCore;
-            m_Animator = m_playerCore.m_AnimationManager.m_Animator;
+            m_animator = m_playerCore.m_AnimationManager.m_Animator;
         }
-
-        public LocomotionStateUtility m_StateUtility;
 
         #region ======================================== State 관리
         private LocomotionStrategyState m_currentStrategyState;
@@ -29,6 +29,8 @@ namespace DUS.Player.Locomotion {
         public float m_CurrentSpeed { get; private set; }
         public bool m_IsGrounded { get; private set; }
         public Vector3 m_CurrentVelocityXZ { get; private set; }
+        public event Action<bool> m_OnAllFlag;
+
         // PlayerCore Start에서 호출
         public void InitializeLocomotionAtStart()
         {
@@ -37,6 +39,8 @@ namespace DUS.Player.Locomotion {
             m_currentStrategyState = m_StateUtility.m_MainStrategyMap[LocomotionMainState.Idle];
             Debug.Log(m_currentStrategyState);
             m_currentStrategyState.Enter();
+
+
             //m_StateUtility.SetMainStateAnimation();
         }
 
@@ -139,11 +143,6 @@ namespace DUS.Player.Locomotion {
             //이동 애니메이션
             m_playerCore.m_AnimationManager.UpdateMovementAnimation(m_currentAniInput);
         }
-        public void InitializeVelocity()
-        {
-            m_CurrentVelocityXZ = Vector2.zero;
-            //m_CurrentVelocityY = 0;
-        }
 
         public void HandleRotation(bool isNotBodyRot)
         {
@@ -184,7 +183,7 @@ namespace DUS.Player.Locomotion {
             Quaternion targetRotation = Quaternion.LookRotation(targetForward);
 
             // 일반상태와 에임 상태에 따라 회전 속도 조절
-            float rotationSpeed = m_playerCore.m_CurrentRotSpeed; //Aim 상태에서 스피드 다루기
+            float rotationSpeed = m_playerCore.m_CurrentRotSpeed; //AimState 상태에서 스피드 다루기
 
             // 회전 속도 조절
             //float maxDegrees = rotationSpeed * Time.deltaTime * m_playerCore.m_rotationDamping; //m_rotationDamping : 감속 주는것
@@ -228,7 +227,7 @@ namespace DUS.Player.Locomotion {
 
         #endregion ======================================== /Move & Rotation
 
-
+        #region ======================================== State & Animation 관리
         // 상태 우선순위 처리
         public LocomotionStrategyState? IsAction()
         {
@@ -245,7 +244,28 @@ namespace DUS.Player.Locomotion {
             return null;
         }
 
-        #region ======================================== Flags & FlagsAnimation 관리
+        //해당 파라미터 타입에 따라 분류
+        public void SetMainStateAnimation(LocomotionMainState locomotionMainState, AniParmType[] aniParmType, bool isPlay = false)
+        {
+
+            if (m_StateUtility.m_MainStateAniParmMap.TryGetValue(locomotionMainState, out var parmNames))
+            {
+                for (int i = 0; i < parmNames.Length && i < aniParmType.Length; i++) //i < parmNames.Length && i< aniParmType.Length -> 길이 확실히 같은지 
+                {
+                    switch (aniParmType[i])
+                    {
+                        case AniParmType.SetBool:
+                            m_animator.SetBool(parmNames[0], isPlay);
+                            break;
+                        case AniParmType.SetTrigger:
+                            m_animator.SetBool(parmNames[1], isPlay);
+                            break;
+                    }
+                }
+
+            }
+        }
+
         // FlagsAnimation은 Set와 Remove에서 알아서 변환
         // HandleCheckFlags가 필요한 상태에서 불러주기
         public void HandleCheckFlags(LocomotionSubFlags checkFlags, bool isCheck, bool isAllNotFlags = false)
@@ -253,10 +273,31 @@ namespace DUS.Player.Locomotion {
             if (isAllNotFlags) return;
 
             if (isCheck)
-                m_StateUtility.SetLocomotionFlag(checkFlags, m_Animator);
+                SetFlag(checkFlags);
             else
-                m_StateUtility.RemoveLocomotionFlag(checkFlags, m_Animator);
+                RemoveFlag(checkFlags);
         }
+        public void SetFlag(LocomotionSubFlags flag)
+        {
+            m_animator.SetBool(m_StateUtility.m_FlagAniMap[flag], true);
+            m_StateUtility.SetLocomotionFlag(flag);
+        }
+        public void RemoveFlag(LocomotionSubFlags flag)
+        {
+            m_animator.SetBool(m_StateUtility.m_FlagAniMap[flag], false);
+            m_StateUtility.RemoveLocomotionFlag(flag);
+        }
+
+        public void AllClearFlag()
+        {
+            foreach (var flag in m_StateUtility.m_FlagAniMap.Keys)
+            {
+                if (flag == LocomotionSubFlags.None) continue;
+                m_animator.SetBool(m_StateUtility.m_FlagAniMap[flag], false);
+            }
+            m_playerCore.m_InputManager.SetAllInputFlag(false);
+        }
+
         #endregion ======================================== /Animation 호출
     }
 

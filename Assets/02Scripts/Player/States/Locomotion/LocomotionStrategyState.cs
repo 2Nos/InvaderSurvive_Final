@@ -3,17 +3,15 @@ using UnityEngine;
 using DUS.Player.Locomotion;
 using System.Collections.Generic;
 
-public abstract class LocomotionStrategyState
+public abstract class LocomotionStrategyState : IBaseState
 {
     protected PlayerCore m_PlayerCore;
     protected PlayerLocomotion m_Locomotion;
-    protected PlayerAnimationManager m_AniamtionManager;
 
     public LocomotionStrategyState(PlayerCore playerCore)
     {
         m_PlayerCore = playerCore;
         m_Locomotion = playerCore.m_Locomotion;
-        m_AniamtionManager = m_PlayerCore.m_AnimationManager;
     }
 
     // TODO : 추상 함수들 차후 Interface로 분류
@@ -58,7 +56,7 @@ public abstract class LocomotionStrategyState
 
         m_AniParmType = new AniParmType [SetAniParmType().Length];
         m_AniParmType = SetAniParmType();
-        m_Locomotion.m_StateUtility.SetMainStateAnimation(m_ThisState, m_AniamtionManager.m_Animator, m_AniParmType, true); //애니메이션 파라미터 값 적용 (시작)
+        m_Locomotion.SetMainStateAnimation(m_ThisState, m_AniParmType, true); //애니메이션 파라미터 값 적용 (시작)
     }
 
     public virtual void FixedUpdate()
@@ -76,10 +74,12 @@ public abstract class LocomotionStrategyState
         m_Locomotion.HandleRotation(m_IsNotBodyRot);
     }
 
+    public void LateUpdate() { }
+
     public virtual void Exit()
     {
         //애니메이션 파라미터값 적용 (종료)
-        m_Locomotion.m_StateUtility.SetMainStateAnimation(m_ThisState, m_AniamtionManager.m_Animator, m_AniParmType, false); //애니메이션 파라미터 값 적용 (시작)
+        m_Locomotion.SetMainStateAnimation(m_ThisState, m_AniParmType, false); //애니메이션 파라미터 값 적용 (시작)
         
         InitializeExit();
     }
@@ -88,8 +88,7 @@ public abstract class LocomotionStrategyState
     {
         if (!m_IsComeInCurrentStateAni)
         {
-            Debug.Log("m_GoNextStateTime");
-            m_AnimationTime = m_AniamtionManager.CheckComeInCurrentStateAni(aniName);
+            m_AnimationTime = m_PlayerCore.m_AnimationManager.CheckComeInCurrentStateAni(aniName);
             if (m_AnimationTime > 0) m_IsComeInCurrentStateAni = true;
             m_GoNextStateTime = m_AnimationTime + m_GoStateDelayTime;
             return false;

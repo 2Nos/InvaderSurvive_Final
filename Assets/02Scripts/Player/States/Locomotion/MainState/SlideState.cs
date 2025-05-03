@@ -33,8 +33,6 @@ public class SlideState : LocomotionStrategyState
 
         if (!CheckComeInCurrentAni(m_AniName)) return;
 
-        Debug.Log(m_GoNextStateTime);
-
         if (m_GoNextStateTime >= 0)
         {
             m_GoNextStateTime -= Time.fixedDeltaTime;
@@ -49,7 +47,6 @@ public class SlideState : LocomotionStrategyState
     public override void Exit()
     {
         base.Exit();
-        //m_Locomotion.m_StateUtility.AllClearFlags(m_AniamtionManager.m_Animator);
         m_PlayerCore.OnChangeColider(true);
     }
 }

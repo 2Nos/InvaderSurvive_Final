@@ -77,18 +77,10 @@ public class MoveState : LocomotionStrategyState
         {
             m_Locomotion.SetNextState(LocomotionMainState.Idle);
         }
-
-        ResetFlagButton(isCrouch,isRun);
     }
     public override void Exit()
     {
         base.Exit();
-        m_Locomotion.m_StateUtility.AllClearFlags(m_PlayerCore.m_AnimationManager.m_Animator);
-    }
-
-    public void ResetFlagButton(bool isCrouch, bool isRun)
-    {
-        if (isCrouch) m_PlayerCore.m_InputManager.ToggleCrouch();
-        if (isRun) m_PlayerCore.m_InputManager.ToggleRun();
+        m_Locomotion.AllClearFlag();
     }
 }

@@ -100,7 +100,7 @@ public partial class @PlayerInputAC: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Aim"",
+                    ""name"": ""AimState"",
                     ""type"": ""Button"",
                     ""id"": ""46629f50-45ea-4048-8aa4-b5bb0d588533"",
                     ""expectedControlType"": """",
@@ -263,7 +263,7 @@ public partial class @PlayerInputAC: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Aim"",
+                    ""action"": ""AimState"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -415,7 +415,7 @@ public partial class @PlayerInputAC: IInputActionCollection2, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Dodge = m_Player.FindAction("Dodge", throwIfNotFound: true);
         m_Player_Reload = m_Player.FindAction("Reload", throwIfNotFound: true);
-        m_Player_Aim = m_Player.FindAction("Aim", throwIfNotFound: true);
+        m_Player_Aim = m_Player.FindAction("AimState", throwIfNotFound: true);
         m_Player_Skill = m_Player.FindAction("Skill", throwIfNotFound: true);
         m_Player_Interaction = m_Player.FindAction("Interaction", throwIfNotFound: true);
         m_Player_StopCameraRot = m_Player.FindAction("StopCameraRot", throwIfNotFound: true);

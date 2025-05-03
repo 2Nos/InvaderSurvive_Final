@@ -86,10 +86,10 @@ public class StateButtonGroupManager : MonoBehaviour
         switch (buttonType)
         {
             case StateButtonTpye.Run:
-                m_playerCore.m_InputManager.SetIsRunInput(isActive);
+                m_playerCore.m_InputManager.SetRunInput(isActive);
                 break;
             case StateButtonTpye.Crouch:
-                m_playerCore.m_InputManager.SetIsCrouchInput(isActive);
+                m_playerCore.m_InputManager.SetCrouch(isActive);
                 break;
             case StateButtonTpye.Jump:
                 m_playerCore.m_InputManager.SetIsInAirInput(isActive);
