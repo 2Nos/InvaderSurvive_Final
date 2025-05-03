@@ -6,16 +6,10 @@ using UnityEngine;
 namespace DUS.Player {
     public static class PlayerPhysicsUtility
     {
-        public static void SetVelocity(Rigidbody rigid, Vector3 velocity)
+        public static void SetVelocityXZ(Rigidbody rigid, Vector3 velocityXZ)
         {
-            rigid.linearVelocity = velocity;
-        }
-
-        public static void SetVelocityY(Rigidbody rigid, float velocityY)
-        {
-            Vector3 v = rigid.linearVelocity;
-            v.y = velocityY;
-            rigid.linearVelocity = v;
+            Vector3 currentVelocity = rigid.linearVelocity;
+            rigid.linearVelocity = new Vector3(velocityXZ.x, currentVelocity.y, velocityXZ.z);
         }
 
         public static Vector3 ClampVelocityY(Rigidbody rigid, float minY, float maxY)
@@ -27,15 +21,15 @@ namespace DUS.Player {
         }
 
         // 질량
-        public static void ApplyGravity(Rigidbody rigid, Vector3 gravity)
+        public static void ApplyGravity(Rigidbody rigid)
         {
-            // 질량까지 적용되는 자연스러운 힘
-            rigid.AddForce(gravity * rigid.mass, ForceMode.Force);
+            // 질량까지 적용되는 자연스러운 힘으로 사용
+            rigid.AddForce(Physics.gravity * rigid.mass, ForceMode.Force);
 
-            /*var velocity = rigid.linearVelocity;
+            /*var velocityXZ = rigid.linearVelocity;
             var acceleration = Physics.gravity;
-            velocity += acceleration * Time.fixedDeltaTime;
-            rigid.linearVelocity = velocity;*/
+            velocityXZ += acceleration * Time.fixedDeltaTime;
+            rigid.linearVelocity = velocityXZ;*/
         }
     }
 }

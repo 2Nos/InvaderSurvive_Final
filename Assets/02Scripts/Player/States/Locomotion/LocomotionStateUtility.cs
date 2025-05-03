@@ -43,29 +43,18 @@ namespace DUS.Player.Locomotion
 
         // ========== Map ==========
         public Dictionary<LocomotionMainState, LocomotionStrategyState> m_MainStrategyMap = new();
-        private readonly Dictionary<LocomotionMainState, string> m_MainStateAniMap = new()
+        //SetBool = 0번 인덱스, SetTrigger = 1번
+        private readonly Dictionary<LocomotionMainState, string[]> m_MainStateAniParmMap = new()
         {
-            { LocomotionMainState.Idle, "IsIdle" },
-            { LocomotionMainState.Move, "IsMove" },
-            { LocomotionMainState.Jump, "IsJump" },
-            { LocomotionMainState.InAir, "IsInAir" },
-            { LocomotionMainState.Land, "IsLand" },
-            { LocomotionMainState.Slide, "IsSlide" },
-            { LocomotionMainState.Climb, "IsClimb" },
-            { LocomotionMainState.WallRun, "IsWallRun" }
+            { LocomotionMainState.Idle, new string[]{"IsIdle" } },
+            { LocomotionMainState.Move, new string[]{"IsMove" } },
+            { LocomotionMainState.Jump, new string[]{"IsJump","Jump"} },
+            { LocomotionMainState.InAir, new string[]{"IsInAir" } },
+            { LocomotionMainState.Land, new string[]{"IsLand" } },
+            { LocomotionMainState.Slide, new string[]{"IsSlide", "Slide" } },
+            { LocomotionMainState.Climb, new string[]{"IsClimb" } },
+            { LocomotionMainState.WallRun, new string[]{"IsWallRun" } }
         };
-        private readonly Dictionary<LocomotionMainState, string> m_MainTriggerAniMap = new()
-        {
-            { LocomotionMainState.Idle, "Idle" },
-            { LocomotionMainState.Move, "Move" },
-            { LocomotionMainState.Jump, "Jump" },
-            { LocomotionMainState.InAir, "InAir" },
-            { LocomotionMainState.Land, "Land" },
-            { LocomotionMainState.Slide, "Slide" },
-            { LocomotionMainState.Climb, "Climb" },
-            { LocomotionMainState.WallRun, "WallRun" }
-        }; // 트리거도 필요할 경우
-
         public void InitializeCreateMainStateMap(PlayerCore player)
         {
             m_MainStrategyMap[LocomotionMainState.Idle] = new IdleState(player);
@@ -77,20 +66,28 @@ namespace DUS.Player.Locomotion
             m_MainStrategyMap[LocomotionMainState.Climb] = new ClimbState(player);
             m_MainStrategyMap[LocomotionMainState.WallRun] = new WallRunState(player);
         }
-
-        public void SetMainStateAnimation(LocomotionMainState locomotionMainState, Animator animator, AniParmType aniParmType, bool isPlay = false)
+        public void SetMainStateAnimation(LocomotionMainState locomotionMainState, Animator animator, AniParmType[] aniParmType, bool isPlay = false)
         {
-            switch (aniParmType)
+
+            if (m_MainStateAniParmMap.TryGetValue(locomotionMainState, out var parmNames))
             {
-                case AniParmType.SetBool:
-                    animator.SetBool(m_MainStateAniMap[locomotionMainState], isPlay);
-                    break;
-                case AniParmType.SetTrigger:
-                    animator.SetTrigger(m_MainTriggerAniMap[locomotionMainState]);
-                    break;
+                for (int i = 0; i < parmNames.Length && i< aniParmType.Length; i++) //i < parmNames.Length && i< aniParmType.Length -> 길이 확실히 같은지 
+                {
+                    switch (aniParmType[i])
+                    {
+                        case AniParmType.SetBool:
+                            animator.SetBool(parmNames[0], isPlay);
+                            break;
+                        case AniParmType.SetTrigger:
+                            animator.SetBool(parmNames[1], isPlay);
+                            break;
+                    }
+                }
+
             }
         }
         #endregion ======================================== /MainSate 관리
+
 
         #region ======================================== SubFlags 관리
         private HashSet<LocomotionSubFlags> m_CurrentFlags = new();
@@ -109,8 +106,8 @@ namespace DUS.Player.Locomotion
         /// <param name="animator"></param>
         public void SetLocomotionFlag(LocomotionSubFlags flag, Animator animator)
         {
-            m_CurrentFlags.Add(flag); 
             animator.SetBool(m_FlagAniMap[flag], true);
+            m_CurrentFlags.Add(flag); 
         }
 
         public void RemoveLocomotionFlag(LocomotionSubFlags flag, Animator animator)
@@ -121,13 +118,15 @@ namespace DUS.Player.Locomotion
         public bool HasLocomotionFlag(LocomotionSubFlags flag) => m_CurrentFlags.Contains(flag);
         public void AllClearFlags(Animator animator)
         {
-            m_CurrentFlags.Clear();
-            foreach(var flag in m_FlagAniMap.Keys)
+            foreach (var flag in m_FlagAniMap.Keys)
             {
                 animator.SetBool(m_FlagAniMap[flag], false);
             }
+            
+            m_CurrentFlags.Clear();
         } 
         #endregion ======================================== /SubFlags 관리
+
 
 
     }

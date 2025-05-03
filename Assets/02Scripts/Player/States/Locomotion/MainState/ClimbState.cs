@@ -6,7 +6,7 @@ public class ClimbState : LocomotionStrategyState
 
     protected override LocomotionMainState DetermineStateType() => LocomotionMainState.Climb;
 
-    protected override AniParmType SetAniParmType() => AniParmType.SetBool;
+    protected override AniParmType[] SetAniParmType() => new AniParmType[] { AniParmType.SetBool };
 
-    //public override LocomotionMainState DetermineStateType() => LocomotionMainState.Climb;
+    protected override float SetMoveSpeed() => m_PlayerCore.m_ClimbSpeed;
 }

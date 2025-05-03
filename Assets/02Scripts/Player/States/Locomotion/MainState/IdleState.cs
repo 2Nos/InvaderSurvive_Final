@@ -5,16 +5,11 @@ public class IdleState : LocomotionStrategyState
 {
     public IdleState(PlayerCore playerCore) : base(playerCore) { }
     protected override LocomotionMainState DetermineStateType() => LocomotionMainState.Idle;
-
-    //public override bool StopCheckTransitionToInProgress() => false; // 딱히 필요 없음
-    protected override AniParmType SetAniParmType() => AniParmType.SetBool;
+    protected override AniParmType[] SetAniParmType() => new AniParmType[]{ AniParmType.SetBool};
+    protected override float SetMoveSpeed() => 0;
     public override void Enter()
     {
         base.Enter();
-
-        //m_PlayerCore.SetCurrentMoveSpeed(0f);
-        //m_Locomotion.InitializeVelocity();
-        //if(m_Locomotion.m_IsGrounded) m_PlayerCore.SetRigidVelocity(Vector3.zero);
     }
 
     public override void FixedUpdate()
@@ -30,7 +25,7 @@ public class IdleState : LocomotionStrategyState
         bool isJump = m_PlayerCore.m_InputManager.m_IsJump_LocoM;
         bool isMove = m_PlayerCore.m_InputManager.m_IsMove_LocoM;
 
-        HandleCheckFlags(LocomotionSubFlags.Crouch, isCrouch);
+        m_Locomotion.HandleCheckFlags(LocomotionSubFlags.Crouch, isCrouch);
 
         // Main
         if (isJump)
@@ -46,11 +41,4 @@ public class IdleState : LocomotionStrategyState
     {
         base.Exit();
     }
-
-    public override void UpdateMovement()
-    {
-        m_Locomotion.HandleRotation();
-        //if(!m_Locomotion.m_IsGrounded) m_Locomotion.HandleGravityMovement();
-    }
-
 }

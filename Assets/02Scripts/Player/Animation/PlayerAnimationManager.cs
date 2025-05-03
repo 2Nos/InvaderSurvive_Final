@@ -44,41 +44,22 @@ public class PlayerAnimationManager : MonoBehaviour
         m_Animator.SetFloat(m_moveSpeedHashY, inputMovement.y);
     }
 
-    /* public void UpdateFlagAnimation(LocomotionSubFlags flag, bool active)
-     {
-         switch (flag)
-         {
-             case LocomotionSubFlags.Crouch:
-                 SetParmBool("IsCrouch", active);
-                 break;
-             case LocomotionSubFlags.Run:
-                 SetParmBool("IsRun", active);
-                 break;
-         }
-     }*/
-
     public void CrossFadeAnimation(string animationName, float transitionDuration = 0.25f)
     {
         m_Animator.CrossFade(animationName, transitionDuration);
     }
 
-    // 애니메이션을 Set으로 동작 시켰어도 애니메이션은 1프레임 후에 동작이 이루어지기 때문에 
-    // Enter에서 애니메이션을 동작 시켜도 이전 애니메이션의 시간으로 체크가 되기에 확실하게 넘어간 후 잡아주어야한다.
-    // Enter에서 해보았지만 안됨 Update에서 그냥 체크하기로
-    /*public async Task<float> CheckAnimationTime(string animationName)
-    {
-        // 애니메이션 상태가 바뀔 때까지 기다림 (동기화 위해 1프레임 대기)
-        await Task.Yield();
-        await Task.Delay(50); // 50ms 대기 추가
-        AnimatorStateInfo stateInfo = m_Animator.GetCurrentAnimatorStateInfo(0);
 
-        // 상태 이름이 일치하는 경우에만 애니메이션 길이를 리턴
-        if (stateInfo.IsName(animationName))
-        {
-            return stateInfo.length;
-        }
-        return 0f; // 애니메이션이 아직 바뀌지 않았을 경우
-    }*/
+    //Enter에서 이전 애니메이션이름으로 들어와져 길이를 못구하는 문제 발생
+    //이를 Enter에서 비동기 처리도 해보았지만 알되서 결국 Update에서 하기로
+    public float CheckComeInCurrentStateAni(string currentAniName)
+    {
+        AnimatorClipInfo[] clips;
+
+        clips = m_Animator.GetCurrentAnimatorClipInfo(0);
+        if (clips == null || clips[0].clip.name != currentAniName) return 0;
+        return clips[0].clip.length;
+    }
 
     public void CheckJumpUp()
     {
