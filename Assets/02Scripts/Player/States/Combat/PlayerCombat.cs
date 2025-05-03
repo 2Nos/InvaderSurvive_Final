@@ -1,24 +1,57 @@
-public class PlayerCombat
-{
-    private readonly PlayerCore m_core;
-    private CombatBaseState m_currentState;
+using UnityEngine;
 
-    public PlayerCombat(PlayerCore core)
+namespace DUS.Player.Combat {
+    public class PlayerCombat
     {
-        this.m_core = core;
-        //UpdateSwitchState(new NoCombatState(this));
-    }
+        private PlayerCore m_playerCore;
+        private Animator m_animator;
+        private CombatStateUtility m_stateUtility;
 
-    public void Update()
-    {
-        m_currentState?.Update();
-    }
+        public PlayerCombat(PlayerCore playerCore)
+        {
+            m_playerCore = playerCore;
+            m_animator = m_playerCore.m_AnimationManager.m_Animator;
+        }
 
-    public void ChangeState(CombatBaseState newState)
-    {
-        m_currentState?.Exit();
-        m_currentState = newState;
-        m_currentState?.Enter();
-    }
+        #region ======================================== State 包府
+        private CombatStrategyState m_currentStrategyState;
+        public CombatStrategyState m_nextStrategyState { get; set; }
+        public CombatStrategyState m_prevStrategyState { get; private set; }
+        #endregion ======================================== /State 包府
+        //PlayerCore Start俊辑 龋免
+        public void InitializeCombatStart()
+        {
+            m_currentStrategyState = m_stateUtility.m_MainStrategyMap[CombatMainState.CombatIdle];
+            m_currentStrategyState.Enter();
+        }
 
+        public void FixedUpdate()
+        {
+
+        }
+
+        public void Update()
+        {
+
+            m_currentStrategyState?.Update();
+
+            if (m_currentStrategyState != m_nextStrategyState)
+                UpdateSwitchState(m_nextStrategyState);
+        }
+        public void LateUpdate(){}
+        public void SetNextState(CombatMainState combatMainState)
+        {
+            m_nextStrategyState = m_stateUtility.m_MainStrategyMap[combatMainState];
+        }
+
+        public void UpdateSwitchState(CombatStrategyState nextState)
+        {
+            if (nextState == null) return;
+            m_currentStrategyState?.Exit();
+            m_currentStrategyState = nextState;
+            m_currentStrategyState?.Enter();
+        }
+
+
+    }
 }

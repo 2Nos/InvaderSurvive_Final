@@ -7,7 +7,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Rifle Idle
+  m_Name: RifleIdle
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -595,7 +595,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: New State 0
+  m_Name: MeleeIdle
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
@@ -1357,13 +1357,13 @@ AnimatorStateMachine:
     m_Position: {x: 380, y: 180, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -976620986196688333}
-    m_Position: {x: 640, y: 260, z: 0}
+    m_Position: {x: 620, y: 250, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -8277802977621530747}
-    m_Position: {x: 620, y: 90, z: 0}
+    m_Position: {x: 620, y: 110, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 1850289981107900723}
-    m_Position: {x: 900, y: 80, z: 0}
+    m_Position: {x: 880, y: 110, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []
@@ -1388,16 +1388,16 @@ AnimatorStateMachine:
     m_Position: {x: 330, y: 390, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 6860246063252319485}
-    m_Position: {x: 570, y: 270, z: 0}
+    m_Position: {x: 670, y: 320, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -5723600513713778217}
-    m_Position: {x: 820, y: 400, z: 0}
+    m_Position: {x: 960, y: 390, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 6952046889560254242}
-    m_Position: {x: 560, y: 530, z: 0}
+    m_Position: {x: 670, y: 460, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -3571735883575871870}
-    m_Position: {x: 820, y: 540, z: 0}
+    m_Position: {x: 960, y: 510, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 3764546958214788336}
     m_Position: {x: 1310, y: 90, z: 0}
@@ -1425,7 +1425,7 @@ AnimatorStateMachine:
   m_StateMachineBehaviours: []
   m_AnyStatePosition: {x: 1300, y: -60, z: 0}
   m_EntryPosition: {x: 100, y: 390, z: 0}
-  m_ExitPosition: {x: 1180, y: 390, z: 0}
+  m_ExitPosition: {x: 1470, y: 390, z: 0}
   m_ParentStateMachinePosition: {x: 800, y: 20, z: 0}
   m_DefaultState: {fileID: 9087195236721184138}
 --- !u!1102 &3764546958214788336

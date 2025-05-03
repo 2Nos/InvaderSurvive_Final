@@ -1,30 +1,6 @@
 using System;
 using UnityEngine;
 
-#region ======================================== Combat
-/// <summary>
-/// 전투상태일 때의 메인 상태
-/// </summary>
-public enum CombatMainState
-{
-    None = 0,
-    Shooting = 1,         //원거리 공격
-    MeleeAttacking = 2,   //근접 공격
-}
-
-/// <summary>
-/// 메인 전투상태 + Flags 복수개
-/// </summary>
-[Flags]
-public enum CombatSubFlags
-{
-    None = 0,
-    Aming = 1 << 0,            // 조준
-    Reloading = 1 << 1,        // 재장전
-    WeaponSwapping = 1 << 2,   // 무기 교체
-    ChargingMelee = 1 << 3,    // 근접 차지 공격 준비
-    ExecutingMelee = 1 << 4    // 근접 처형 (피니시)
-}
 
 public enum AbilityMainState
 {
@@ -32,7 +8,6 @@ public enum AbilityMainState
     UsingAbility = 1,
     UsingUltimate = 2
 }
-#endregion ======================================== /Combat
 
 
 #region ======================================== Interaction
@@ -53,11 +28,7 @@ public enum InteractionFlags
 
 public class MainStateAndSubFlagsManager : MonoBehaviour
 {
-    public CombatMainState m_CombatMain
-    {
-        get => m_combatMain;
-        set => m_combatMain = value;
-    }
+    
     public AbilityMainState m_AbilityMain
     {
         get => m_abilityMain;
@@ -71,11 +42,11 @@ public class MainStateAndSubFlagsManager : MonoBehaviour
     }
 
     #region ======================================== Combat
-    private CombatMainState m_combatMain = CombatMainState.None;
-    private CombatSubFlags m_CombatFlags = CombatSubFlags.None;
+    /*private CombatMainState m_combatMain = CombatMainState.CombatIdleState;
+    private CombatSubFlags m_CombatFlags = CombatSubFlags.CombatIdleState;
     public void SetCombatFlag(CombatSubFlags flag) => m_CombatFlags |= flag;
     public bool HasCombatFlag(CombatSubFlags flag) => (m_CombatFlags & flag) != 0;
-    public void ClearCombatFlag(CombatSubFlags flag) => m_CombatFlags &= ~flag;
+    public void ClearCombatFlag(CombatSubFlags flag) => m_CombatFlags &= ~flag;*/
     #endregion ======================================== /Combat
 
     #region ======================================== Ability
@@ -89,16 +60,4 @@ public class MainStateAndSubFlagsManager : MonoBehaviour
     public void ClearInteractionFlag(InteractionFlags flag) => m_interactionFlags &= ~flag;
     #endregion ======================================== /Interaction
 
-    // 전체 상태 출력
-    public string DumpAllStates()
-    {
-        return $"m_Combat Main: {m_CombatMain}, Flags: {m_CombatFlags}\n" +
-               $"Interaction Flags: {m_InteractionFlags}";
-    }
-
-    // 필요 시 개별 로그 메서드도 제공
-    public void DebugPrintFlags()
-    {
-        Debug.Log(DumpAllStates());
-    }
 }
