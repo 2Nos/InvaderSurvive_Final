@@ -7,9 +7,11 @@ namespace DUS.Player.Locomotion {
     public class PlayerLocomotion
     {
         private PlayerCore m_playerCore;
+        private Animator m_Animator;
         public PlayerLocomotion(PlayerCore playerCore)
         {
             m_playerCore = playerCore;
+            m_Animator = m_playerCore.m_AnimationManager.m_Animator;
         }
 
         public LocomotionStateUtility m_StateUtility;
@@ -22,12 +24,11 @@ namespace DUS.Player.Locomotion {
 
         // Move 설정
         private Vector2 m_currentAniInput = Vector2.zero;
-        public Vector3 m_CurrentVelocity;
-        public float m_CurrentVelocityY;
+
         private float m_prevSpeed = 0;
-
+        public float m_CurrentSpeed { get; private set; }
         public bool m_IsGrounded { get; private set; }
-
+        public Vector3 m_CurrentVelocityXZ { get; private set; }
         // PlayerCore Start에서 호출
         public void InitializeLocomotionAtStart()
         {
@@ -42,8 +43,6 @@ namespace DUS.Player.Locomotion {
         public void FixedUpdate()
         {
             m_currentStrategyState?.FixedUpdate();
-            UpdateCheckGround();
-            HandleGravityMovement();
         }
 
         public void Update()
@@ -81,8 +80,10 @@ namespace DUS.Player.Locomotion {
         /// <summary>
         /// 지면 체크
         /// </summary>
-        public void UpdateCheckGround()
+        public void HandleCheckGround(bool isNotCheckGround)
         {
+            if (isNotCheckGround) return;
+
             Vector3 centerRay = m_playerCore.m_Rigidbody.position + Vector3.up * 0.1f;
             Vector3 forwardRay = m_playerCore.transform.position + m_playerCore.transform.forward * 0.25f + m_playerCore.transform.up * 0.3f;
             Vector3 rayDir = -m_playerCore.transform.up;
@@ -113,8 +114,9 @@ namespace DUS.Player.Locomotion {
         /// FixedUpdate에서 호출
         /// 이동, 회전, 중력, 점프는 각 상태에서 호출
         /// </summary>
-        public void HandleMove()
+        public void HandleMove(bool isNotInputMove = false, float moveSpeed = 0)
         {
+            if (isNotInputMove) return;
             // 1.초기화
             Vector2 moveInput = m_playerCore.m_InputManager.m_MovementInput;    //입력값
             Vector3 m_moveDirection = m_playerCore.transform.right * moveInput.x + m_playerCore.transform.forward * moveInput.y; //방향
@@ -125,28 +127,28 @@ namespace DUS.Player.Locomotion {
 
             // 3. 이동 중일 때
             // 3.1. 이동 속도 결정은 각 상태에서 Set로 설정(스피드 종류가 많은 관계로)
-            float currentSpeed = m_playerCore.m_CurrentSpeed;
+            m_CurrentSpeed = moveSpeed;
 
-            currentSpeed = Mathf.Lerp(m_prevSpeed, currentSpeed, Time.deltaTime * 10f); //이전 스피드에서 현재 스피드로 보간
-            m_prevSpeed = currentSpeed;
-            m_CurrentVelocity = m_moveDirection * currentSpeed;
-
+            m_CurrentSpeed = Mathf.Lerp(m_prevSpeed, m_CurrentSpeed, Time.deltaTime * 10f); //이전 스피드에서 현재 스피드로 보간
+            m_prevSpeed = m_CurrentSpeed;
+            m_CurrentVelocityXZ = m_moveDirection * m_CurrentSpeed;
+  
             // 3.2 이동값 적용 (이런류의 게임은 단순 좌표보다는 물리엔진이용)
-            m_playerCore.SetRigidVelocity(m_CurrentVelocity);
+            PlayerPhysicsUtility.SetVelocityXZ(m_playerCore.m_Rigidbody, m_CurrentVelocityXZ);
 
             //이동 애니메이션
             m_playerCore.m_AnimationManager.UpdateMovementAnimation(m_currentAniInput);
         }
         public void InitializeVelocity()
         {
-            m_CurrentVelocity = Vector2.zero;
-            m_CurrentVelocityY = 0;
+            m_CurrentVelocityXZ = Vector2.zero;
+            //m_CurrentVelocityY = 0;
         }
 
-        public void HandleRotation()
+        public void HandleRotation(bool isNotBodyRot)
         {
             // 화면 회전 중지 시
-            if (m_playerCore.m_InputManager.m_IsStopBodyRot) return;
+            if (isNotBodyRot || m_playerCore.m_InputManager.m_IsStopBodyRot) return;
 
             // 현재 플레이어 방향
             Quaternion currentRotation = m_playerCore.m_Rigidbody.transform.rotation;
@@ -192,15 +194,24 @@ namespace DUS.Player.Locomotion {
             m_playerCore.m_Rigidbody.MoveRotation(smoothedRotation);
         }
 
-        public void HandleGravityMovement()
+        public void HandleJumpForce()
         {
-            if (m_IsGrounded) return;
+            m_playerCore.m_Rigidbody.AddForce(Vector3.up * m_playerCore.m_JumpForce, ForceMode.Impulse);
+            //PlayerPhysicsUtility.ClampVelocityY(m_playerCore.m_Rigidbody,m_playerCore.m_MinVelocityY,m_playerCore.m_MaxVelocityY);
+        }
 
-            Debug.Log("Gravity");
+        //m_IsNotInputMove로 HandleMove를 중지 시켰을 때 진행 중이던 현재값 적용
+        public void HandleMaintainForwardForceMove(Vector3 m_CurrentVelocityXZ)
+        {
+            PlayerPhysicsUtility.SetVelocityXZ(m_playerCore.m_Rigidbody, m_CurrentVelocityXZ);
+        }
+
+        public void HandleApplyGravity(bool isNotApplyGravity)
+        {
+            if (m_IsGrounded || isNotApplyGravity) return;
 
             // 중력 적용
-            Debug.Log(Physics.gravity);
-            PlayerPhysicsUtility.ApplyGravity(m_playerCore.m_Rigidbody, Physics.gravity * m_playerCore.m_AddGravity);
+            PlayerPhysicsUtility.ApplyGravity(m_playerCore.m_Rigidbody);
 
 
 
@@ -217,8 +228,35 @@ namespace DUS.Player.Locomotion {
 
         #endregion ======================================== /Move & Rotation
 
-        #region ======================================== Animation 관리
 
+        // 상태 우선순위 처리
+        public LocomotionStrategyState? IsAction()
+        {
+            // 공통 우선순위: 구르기, 피격 상태 등 전역 ActionState 우선
+
+            /*if (m_PlayerLocomotion.m_StateFlagManager.HasActionStateFlags(ActionStateFlags.Dodge))
+            {
+                return new DodgeState(m_PlayerLocomotion);
+            }
+            if (m_PlayerLocomotion.m_StateFlagManager.HasActionStateFlags(ActionStateFlags.Staggered))
+            {
+                return new StaggeredState(m_PlayerLocomotion);
+            }*/
+            return null;
+        }
+
+        #region ======================================== Flags & FlagsAnimation 관리
+        // FlagsAnimation은 Set와 Remove에서 알아서 변환
+        // HandleCheckFlags가 필요한 상태에서 불러주기
+        public void HandleCheckFlags(LocomotionSubFlags checkFlags, bool isCheck, bool isAllNotFlags = false)
+        {
+            if (isAllNotFlags) return;
+
+            if (isCheck)
+                m_StateUtility.SetLocomotionFlag(checkFlags, m_Animator);
+            else
+                m_StateUtility.RemoveLocomotionFlag(checkFlags, m_Animator);
+        }
         #endregion ======================================== /Animation 호출
     }
 

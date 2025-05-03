@@ -155,39 +155,23 @@ public class PlayerInputManager : MonoBehaviour
 
     private void OnRun(InputAction.CallbackContext context)
     {
+        ToggleRun();
+    }
+
+    public void ToggleRun()
+    {
         m_IsRun_LocoF = !m_IsRun_LocoF;
     }
-    public void SetFlagKey(bool isRun, bool isCrouch, bool isStopBodyRot = false)
-    {
-        m_IsRun_LocoF = isRun;
-        m_IsCrouch_LocoF = isCrouch;
-        m_IsStopBodyRot = isStopBodyRot;
-    }
-    /*public void OnSlideEnter()
-    {
-        m_IsStopBodyRot = true;
-    }
-    //슬라이드가 끝이나면 누른키들은 전부 해제
-    public void OnSlideEnd()
-    {
-        m_IsRun_LocoF = false;
-        m_IsCrouch_LocoF = false;
-        m_IsStopBodyRot = false;
-    }*/
+
     private void OnCrouch(InputAction.CallbackContext context)
     {
-        m_IsCrouch_LocoF = !m_IsCrouch_LocoF;
-
-        /*if (m_IsCrouch_LocoF)
-        {
-            m_StateFlagManager.SetLocomotionFlag(LocomotionSubFlags.Crouch);
-        }
-        else
-        {
-            m_StateFlagManager.ClearLocomotionFlag(LocomotionSubFlags.Crouch);
-        }*/
+        ToggleCrouch();
     }
-
+    // 실제 로직을 분리
+    public void ToggleCrouch()
+    {
+        m_IsCrouch_LocoF = !m_IsCrouch_LocoF;
+    }
     private void OnJump(InputAction.CallbackContext context)
     {
         m_IsJump_LocoM = context.ReadValueAsButton();

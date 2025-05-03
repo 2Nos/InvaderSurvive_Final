@@ -6,19 +6,22 @@ public class LandState : LocomotionStrategyState
 {
     public LandState(PlayerCore playerCore) : base(playerCore){}
     protected override LocomotionMainState DetermineStateType() => LocomotionMainState.Land;
-    protected override AniParmType SetAniParmType() => AniParmType.SetBool;
+    protected override AniParmType[] SetAniParmType() => new AniParmType[] { AniParmType.SetBool };
+    protected override float SetMoveSpeed() => 0;
 
     public override void Enter()
     {
         base.Enter();
-        m_DelayTime = 0;
     }
 
     public override void Update()
     {
         base.Update();
-        CheckTransitionedNextAnimation("Land");
-        if (!m_IsNextStateCheck) return;
+        if (m_IsComeInCurrentStateAni)
+        {
+
+            return;
+        }
 
         if (m_AnimationTime >= 0)
         {
@@ -35,9 +38,4 @@ public class LandState : LocomotionStrategyState
         base.Exit();
     }
 
-    public override void UpdateMovement()
-    {
-       m_Locomotion.HandleRotation();
-
-    }
 }
